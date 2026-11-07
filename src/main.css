@@ -1,0 +1,285 @@
+/* Global styles - Theme, font, utilities, animations and global components */
+
+/* Fontes: Plus Jakarta Sans (interface limpa) e Playfair Display (serifa elegante) */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Tema Natural e Orgânico: Verdes claros, oliva suave, fundo sálvia aconchegante */
+    --background: 140 25% 98%;
+    --foreground: 155 35% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 155 35% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 155 35% 15%;
+
+    /* Verde floresta suave e sustentável (ENVIMAT) */
+    --primary: 154 48% 28%;
+    --primary-foreground: 140 30% 98%;
+
+    /* Verde sálvia claro */
+    --secondary: 142 30% 93%;
+    --secondary-foreground: 154 45% 20%;
+
+    --muted: 140 20% 94%;
+    --muted-foreground: 150 15% 42%;
+
+    --accent: 144 35% 91%;
+    --accent-foreground: 154 45% 20%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 144 20% 88%;
+    --input: 144 20% 88%;
+    --ring: 154 48% 28%;
+
+    --radius: 0.875rem;
+
+    --sidebar-background: 140 22% 96%;
+    --sidebar-foreground: 155 35% 15%;
+    --sidebar-primary: 154 48% 28%;
+    --sidebar-primary-foreground: 140 30% 98%;
+    --sidebar-accent: 142 30% 93%;
+    --sidebar-accent-foreground: 154 45% 20%;
+    --sidebar-border: 144 20% 88%;
+    --sidebar-ring: 154 48% 28%;
+
+    --chart-1: 154 48% 28%;
+    --chart-2: 142 45% 42%;
+    --chart-3: 84 40% 45%;
+    --chart-4: 38 80% 50%;
+    --chart-5: 180 35% 35%;
+  }
+
+  .dark {
+    /* Change the colors to match the design system consistent with the dark mode */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 84% 4.9%;
+
+    --secondary: 222.2 84% 4.9%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222.2 84% 4.9%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 222.2 84% 4.9%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222.2 84% 4.9%;
+    --input: 222.2 84% 4.9%;
+    --ring: 214.3 31.8% 91.4%;
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 222.2 84% 4.9%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222.2 84% 4.9%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 222.2 84% 4.9%;
+    --sidebar-ring: 222.2 84% 4.9%;
+
+    --chart-1: 270 100% 44%;
+    --chart-2: 164 100% 38%;
+    --chart-3: 43 100% 32%;
+    --chart-4: 340 100% 50%;
+    --chart-5: 10 100% 50%;
+  }
+
+  /* NEVER REMOVE THIS */
+  section[aria-label='Notifications alt+T'] {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+@layer utilities {
+  /* KEEP ALL THE ANIMATIONS CLASSES THAT ARE USED BELOW */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in-down {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out-up {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-out-down {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-down {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes spotlight {
+    from {
+      opacity: 0;
+      transform: translate(-72%, -62%) scale(0.5);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -40%) scale(1);
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.5s ease-out;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.6s ease-out;
+  }
+
+  .animate-fade-out-up {
+    animation: fade-out-up 0.6s ease-out;
+  }
+
+  .animate-fade-out-down {
+    animation: fade-out-down 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.6s ease-out;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-spotlight {
+    animation: spotlight 2s ease forwards;
+  }
+}
