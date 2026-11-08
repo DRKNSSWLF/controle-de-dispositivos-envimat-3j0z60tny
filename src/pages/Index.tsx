@@ -3,11 +3,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { dispositivosService, colaboradoresService } from '@/services/inventoryService'
-import { Dispositivo, Colaborador } from '@/types/inventory'
+import {
+  pessoasJuridicasService,
+  vinculosService,
+  manutencoesService,
+  historicoService,
+  contratosService,
+} from '@/services/inventoryService'
+import {
+  Colaborador,
+  Contrato,
+  Dispositivo,
+  HistoricoMovimentacao,
+  Manutencao,
+  PessoaJuridica,
+  Vinculo,
+} from '@/types/inventory'
 import { calcularEstatisticas, gerarAlertas } from '@/lib/alertsAndMetrics'
 import { VisaoGeralInventario } from '@/components/VisaoGeralInventario'
 import { ListaDispositivos } from '@/components/ListaDispositivos'
 import { SecaoColaboradores } from '@/components/SecaoColaboradores'
+import { SecaoPessoasJuridicas } from '@/components/SecaoPessoasJuridicas'
+import { SecaoVinculos } from '@/components/SecaoVinculos'
+import { SecaoContratos } from '@/components/SecaoContratos'
+import { SecaoManutencao } from '@/components/SecaoManutencao'
+import { SecaoHistorico } from '@/components/SecaoHistorico'
 import { ImportarDispositivos } from '@/components/ImportarDispositivos'
 import { ImportarColaboradores } from '@/components/ImportarColaboradores'
 import { PainelAlertas } from '@/components/PainelAlertas'
@@ -22,7 +42,11 @@ import {
   Leaf,
   Layers,
   MapPin,
-  Sparkles,
+  Building2,
+  Link2,
+  FileText,
+  Wrench,
+  History,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -34,6 +58,11 @@ export default function Index() {
 
   const [dispositivos, setDispositivos] = useState<Dispositivo[]>([])
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([])
+  const [pessoasJuridicas, setPessoasJuridicas] = useState<PessoaJuridica[]>([])
+  const [vinculos, setVinculos] = useState<Vinculo[]>([])
+  const [contratos, setContratos] = useState<Contrato[]>([])
+  const [manutencoes, setManutencoes] = useState<Manutencao[]>([])
+  const [historico, setHistorico] = useState<HistoricoMovimentacao[]>([])
   const [carregando, setCarregando] = useState<boolean>(true)
 
   // Filtros globais sincronizados
@@ -44,12 +73,22 @@ export default function Index() {
   const carregarDados = useCallback(async () => {
     try {
       setCarregando(true)
-      const [disps, colabs] = await Promise.all([
+      const [disps, colabs, pjs, vinc, contr, mant, hist] = await Promise.all([
         dispositivosService.listar(),
         colaboradoresService.listar(),
+        pessoasJuridicasService.listar(),
+        vinculosService.listar(),
+        contratosService.listar(),
+        manutencoesService.listar(),
+        historicoService.listar(),
       ])
       setDispositivos(disps)
       setColaboradores(colabs)
+      setPessoasJuridicas(pjs)
+      setVinculos(vinc)
+      setContratos(contr)
+      setManutencoes(mant)
+      setHistorico(hist)
     } catch (err) {
       toast({
         title: 'Erro ao carregar dados',
@@ -108,6 +147,9 @@ export default function Index() {
     setAbaAtiva('dispositivos')
   }
 
+  // Prop comum às seções que mexem no fluxo de vínculos/manutenção/contratos
+  const atualizarTudo = carregarDados
+
   return (
     <div className="min-h-screen bg-[#fafcf9] text-emerald-950 pb-16 font-sans">
       {/* Topo / Header com Identidade ENVIMAT (Meio ambiente, São Carlos - SP, tecnologia sustentável) */}
@@ -162,7 +204,7 @@ export default function Index() {
       {/* Conteúdo Principal com Navegação por Abas */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <Tabs value={abaAtiva} onValueChange={setAbaAtiva} className="space-y-6">
-          {/* Barra de Abas Elegante com cantos arredondados */}
+          {/* Barra de Abas */}
           <div className="flex overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <TabsList className="bg-emerald-100/40 p-1 rounded-2xl border border-emerald-200/50 inline-flex">
               <TabsTrigger
@@ -170,7 +212,7 @@ export default function Index() {
                 className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
               >
                 <Layers className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Inventário & Visão Geral</span>
+                <span>Visão Geral</span>
               </TabsTrigger>
 
               <TabsTrigger
@@ -185,6 +227,28 @@ export default function Index() {
               </TabsTrigger>
 
               <TabsTrigger
+                value="vinculos"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <Link2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Vínculos</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-semibold">
+                  {vinculos.filter((v) => v.situacao === 'ativo').length}
+                </span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="contratos"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Contratos</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-semibold">
+                  {contratos.length}
+                </span>
+              </TabsTrigger>
+
+              <TabsTrigger
                 value="colaboradores"
                 className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
               >
@@ -193,6 +257,36 @@ export default function Index() {
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-semibold">
                   {colaboradores.length}
                 </span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="pj"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <Building2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Pessoas Jurídicas</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-semibold">
+                  {pessoasJuridicas.length}
+                </span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="manutencao"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <Wrench className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Manutenção</span>
+                <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded-full font-semibold">
+                  {manutencoes.filter((m) => m.situacao === 'em_manutencao').length}
+                </span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="historico"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <History className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Histórico</span>
               </TabsTrigger>
 
               <TabsTrigger
@@ -228,7 +322,6 @@ export default function Index() {
               onFiltrarTipo={handleFiltrarPorTipo}
             />
 
-            {/* Painel resumido de alertas na visão geral */}
             {alertas.length > 0 && (
               <div className="bg-white rounded-3xl border border-emerald-100 p-5 sm:p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
@@ -273,7 +366,26 @@ export default function Index() {
             />
           </TabsContent>
 
-          {/* 3. ABA: COLABORADORES */}
+          {/* 3. ABA: VÍNCULOS */}
+          <TabsContent value="vinculos" className="space-y-6 focus-visible:outline-none">
+            <SecaoVinculos
+              vinculos={vinculos}
+              colaboradores={colaboradores}
+              dispositivos={dispositivos}
+              onAtualizar={atualizarTudo}
+            />
+          </TabsContent>
+
+          {/* 4. ABA: CONTRATOS */}
+          <TabsContent value="contratos" className="space-y-6 focus-visible:outline-none">
+            <SecaoContratos
+              contratos={contratos}
+              dispositivos={dispositivos}
+              colaboradores={colaboradores}
+            />
+          </TabsContent>
+
+          {/* 5. ABA: COLABORADORES */}
           <TabsContent value="colaboradores" className="space-y-6 focus-visible:outline-none">
             <SecaoColaboradores
               colaboradores={colaboradores}
@@ -283,7 +395,31 @@ export default function Index() {
             />
           </TabsContent>
 
-          {/* 4. ABA: IMPORTAÇÃO DE PLANILHAS (DISPOSITIVOS E COLABORADORES) */}
+          {/* 6. ABA: PESSOAS JURÍDICAS */}
+          <TabsContent value="pj" className="space-y-6 focus-visible:outline-none">
+            <SecaoPessoasJuridicas
+              pessoasJuridicas={pessoasJuridicas}
+              onAtualizar={carregarDados}
+            />
+          </TabsContent>
+
+          {/* 7. ABA: MANUTENÇÃO */}
+          <TabsContent value="manutencao" className="space-y-6 focus-visible:outline-none">
+            <SecaoManutencao
+              manutencoes={manutencoes}
+              dispositivos={dispositivos}
+              colaboradores={colaboradores}
+              vinculos={vinculos}
+              onAtualizar={atualizarTudo}
+            />
+          </TabsContent>
+
+          {/* 8. ABA: HISTÓRICO DE MOVIMENTAÇÃO */}
+          <TabsContent value="historico" className="space-y-6 focus-visible:outline-none">
+            <SecaoHistorico historico={historico} />
+          </TabsContent>
+
+          {/* 9. ABA: IMPORTAÇÃO DE PLANILHAS */}
           <TabsContent value="importacao" className="space-y-6 focus-visible:outline-none">
             <div className="flex items-center gap-2 p-1 bg-emerald-100/50 rounded-2xl max-w-md border border-emerald-200/60">
               <button
@@ -328,7 +464,7 @@ export default function Index() {
             )}
           </TabsContent>
 
-          {/* 5. ABA: ALERTAS SIMPLES E IDADE */}
+          {/* 10. ABA: ALERTAS */}
           <TabsContent value="alertas" className="space-y-6 focus-visible:outline-none">
             <PainelAlertas
               alertas={alertas}

@@ -5,8 +5,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Colaborador, Dispositivo } from '@/types/inventory'
 import { ModalCadastrarColaborador } from './ModalCadastrarColaborador'
-import { User, Smartphone, Mail, Phone, Briefcase, Search, ArrowRight, Trash2 } from 'lucide-react'
-import { colaboradoresService } from '@/services/inventoryService'
+import {
+  User,
+  Smartphone,
+  Mail,
+  Phone,
+  Briefcase,
+  Search,
+  ArrowRight,
+  UserX,
+  UserCheck,
+} from 'lucide-react'
+import { colaboradoresService, vinculosService } from '@/services/inventoryService'
+import { LABEL_STATUS_COLABORADOR } from '@/lib/labels'
 import { toast } from '@/hooks/use-toast'
 
 interface SecaoColaboradoresProps {
@@ -23,10 +34,10 @@ export function SecaoColaboradores({
   onFiltrarPorColaborador,
 }: SecaoColaboradoresProps) {
   const [busca, setBusca] = useState('')
+  const [alterandoStatus, setAlterandoStatus] = useState<string | null>(null)
 
-  // Agrupa dispositivos por colaborador
   const dispositivosPorColab = (colaboradorId: string) => {
-    return dispositivos.filter((d) => d.colaborador === colaboradorId)
+    return dispositivos.filter((d) => d.colaborador === colaboradorId && d.status === 'em_uso')
   }
 
   const colaboradoresFiltrados = colaboradores.filter((c) => {
@@ -37,35 +48,68 @@ export function SecaoColaboradores({
       (c.departamento && c.departamento.toLowerCase().includes(q)) ||
       (c.cargo && c.cargo.toLowerCase().includes(q)) ||
       (c.email && c.email.toLowerCase().includes(q)) ||
-      (c.matricula && c.matricula.toLowerCase().includes(q))
+      (c.matricula && c.matricula.toLowerCase().includes(q)) ||
+      (c.cpf && c.cpf.toLowerCase().includes(q))
     )
   })
 
-  const handleDelete = async (id: string, nome: string) => {
-    const vinculados = dispositivosPorColab(id)
-    if (vinculados.length > 0) {
-      if (
-        !confirm(
-          `Atenção: Este colaborador possui ${vinculados.length} dispositivo(s) vinculado(s). Deseja realmente excluir?`,
-        )
-      ) {
-        return
-      }
-    } else {
-      if (!confirm(`Excluir o colaborador "${nome}"?`)) return
+  // Alterna ATIVO <-> DESLIGADO. Ao DESLIGAR, desvincula os dispositivos
+  // (voltam para DISPONÍVEL) e gera os distratos — os dados são mantidos.
+  const alternarStatus = async (c: Colaborador) => {
+    const novoStatus = c.status === 'desligado' ? 'ativo' : 'desligado'
+    const vinculados = dispositivosPorColab(c.id)
+
+    if (novoStatus === 'desligado') {
+      const msg = vinculados.length
+        ? `Desligar "${c.nome}"? Os ${vinculados.length} dispositivo(s) vinculado(s) serão devolvidos (voltam para DISPONÍVEL) e o DISTRATO DE COMODATO será gerado. O histórico e os dados do colaborador serão mantidos.`
+        : `Desligar "${c.nome}"? Os dados dele serão mantidos no cadastro, com status DESLIGADO.`
+      if (!confirm(msg)) return
     }
 
+    setAlterandoStatus(c.id)
     try {
-      await colaboradoresService.excluir(id)
-      toast({ title: 'Colaborador removido com sucesso' })
+      if (novoStatus === 'desligado') {
+        const vinculosAtivos = await vinculosService.listar()
+        const doColab = vinculosAtivos.filter(
+          (v) => v.colaborador === c.id && v.situacao === 'ativo',
+        )
+        for (const v of doColab) {
+          await vinculosService.encerrar(v, 'Desligamento do colaborador da empresa')
+        }
+      }
+      await colaboradoresService.atualizar(c.id, { status: novoStatus })
+      toast({
+        title: `Status alterado para ${LABEL_STATUS_COLABORADOR[novoStatus]}`,
+        description:
+          novoStatus === 'desligado'
+            ? 'Dispositivos devolvidos e distratos gerados. Histórico preservado.'
+            : 'Colaborador reativado.',
+      })
       onAtualizar()
     } catch (e) {
       toast({
-        title: 'Erro ao excluir',
+        title: 'Erro ao alterar status',
         description: e instanceof Error ? e.message : 'Tente novamente.',
         variant: 'destructive',
       })
+    } finally {
+      setAlterandoStatus(null)
     }
+  }
+
+  const badgeStatus = (status?: string) => {
+    if (status === 'desligado') {
+      return (
+        <Badge className="bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-100 rounded-full font-medium">
+          Desligado
+        </Badge>
+      )
+    }
+    return (
+      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100 rounded-full font-medium">
+        Ativo
+      </Badge>
+    )
   }
 
   return (
@@ -76,7 +120,7 @@ export function SecaoColaboradores({
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-700/60" />
             <Input
-              placeholder="Buscar colaborador por nome, cargo, departamento ou matrícula..."
+              placeholder="Buscar colaborador por nome, CPF, cargo, departamento ou matrícula..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               className="pl-10 rounded-xl border-emerald-200 focus:ring-emerald-600 bg-emerald-50/20 text-sm"
@@ -101,17 +145,28 @@ export function SecaoColaboradores({
         ) : (
           colaboradoresFiltrados.map((c) => {
             const aparelhos = dispositivosPorColab(c.id)
+            const desligado = c.status === 'desligado'
 
             return (
               <Card
                 key={c.id}
-                className="bg-white border-emerald-100/90 hover:border-emerald-300 transition-all rounded-2xl shadow-sm"
+                className={`rounded-2xl shadow-sm transition-all border ${
+                  desligado
+                    ? 'bg-rose-50/40 border-rose-200/70 hover:border-rose-300'
+                    : 'bg-white border-emerald-100/90 hover:border-emerald-300'
+                }`}
               >
                 <CardContent className="p-5 flex flex-col justify-between h-full space-y-4">
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center font-bold text-sm shrink-0">
+                        <div
+                          className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                            desligado
+                              ? 'bg-rose-100 text-rose-800'
+                              : 'bg-emerald-100/80 text-emerald-800'
+                          }`}
+                        >
                           {c.nome
                             .split(' ')
                             .slice(0, 2)
@@ -132,14 +187,36 @@ export function SecaoColaboradores({
                         </div>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(c.id, c.nome)}
-                        className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {badgeStatus(c.status)}
+                        {/* BOTÃO DE ALTERAÇÃO DE STATUS (ATIVO <-> DESLIGADO) */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={alterandoStatus === c.id}
+                          onClick={() => alternarStatus(c)}
+                          title={
+                            desligado
+                              ? 'Reativar colaborador (ATIVO)'
+                              : 'Desligar colaborador (DESLIGADO)'
+                          }
+                          className={`h-8 rounded-lg text-[11px] font-semibold border ${
+                            desligado
+                              ? 'border-emerald-300 text-emerald-800 hover:bg-emerald-50'
+                              : 'border-rose-300 text-rose-700 hover:bg-rose-50'
+                          }`}
+                        >
+                          {desligado ? (
+                            <>
+                              <UserCheck className="w-3.5 h-3.5 mr-1" /> ATIVAR
+                            </>
+                          ) : (
+                            <>
+                              <UserX className="w-3.5 h-3.5 mr-1" /> DESLIGAR
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Contatos */}
@@ -156,11 +233,18 @@ export function SecaoColaboradores({
                           <span>{c.telefone}</span>
                         </div>
                       )}
-                      {c.matricula && (
-                        <div className="text-[11px] text-emerald-700/70 pt-0.5">
-                          Matrícula: <code className="font-mono">{c.matricula}</code>
-                        </div>
-                      )}
+                      <div className="flex flex-wrap gap-x-4 text-[11px] text-emerald-700/70 pt-0.5">
+                        {c.cpf && (
+                          <span>
+                            CPF: <code className="font-mono">{c.cpf}</code>
+                          </span>
+                        )}
+                        {c.matricula && (
+                          <span>
+                            Matrícula: <code className="font-mono">{c.matricula}</code>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
