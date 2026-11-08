@@ -4,7 +4,6 @@ export const LABEL_STATUS_DISPOSITIVO: Record<string, string> = {
   em_uso: 'Em Uso',
   disponivel: 'Disponível',
   manutencao: 'Em Manutenção',
-  backup: 'Backup / Reserva',
 }
 
 export const LABEL_TIPO_DISPOSITIVO: Record<string, string> = {

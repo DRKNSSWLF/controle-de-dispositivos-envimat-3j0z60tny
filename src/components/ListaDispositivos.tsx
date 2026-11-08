@@ -96,10 +96,10 @@ export function ListaDispositivos({
             Em Uso
           </Badge>
         )
-      case 'backup':
+      case 'disponivel':
         return (
           <Badge className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100 rounded-full font-medium">
-            Backup / Reserva
+            Disponível
           </Badge>
         )
       case 'manutencao':
@@ -268,7 +268,7 @@ export function ListaDispositivos({
                 <SelectContent>
                   <SelectItem value="todos">Todos os status</SelectItem>
                   <SelectItem value="em_uso">Em Uso</SelectItem>
-                  <SelectItem value="backup">Backup / Reserva</SelectItem>
+                  <SelectItem value="disponivel">Disponível</SelectItem>
                   <SelectItem value="manutencao">Em Manutenção</SelectItem>
                 </SelectContent>
               </Select>

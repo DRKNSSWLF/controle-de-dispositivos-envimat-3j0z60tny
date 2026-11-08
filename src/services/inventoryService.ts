@@ -50,13 +50,11 @@ export const pessoasJuridicasService = {
 
 export const vinculosService = {
   async listar(): Promise<Vinculo[]> {
-    return await pb
-      .collection('vinculos')
-      .getFullList<Vinculo>({
-        sort: '-created',
-        expand: 'colaborador,dispositivo',
-        requestKey: null,
-      })
+    return await pb.collection('vinculos').getFullList<Vinculo>({
+      sort: '-created',
+      expand: 'colaborador,dispositivo',
+      requestKey: null,
+    })
   },
 
   async criar(data: NovoVinculoInput): Promise<Vinculo> {
@@ -193,12 +191,10 @@ export const manutencoesService = {
     manutencao: Manutencao,
     novoStatus: 'disponivel' | 'em_uso' = 'disponivel',
   ): Promise<Manutencao> {
-    const atualizada = await pb
-      .collection('manutencoes')
-      .update<Manutencao>(manutencao.id, {
-        situacao: 'retornado',
-        data_retorno: new Date().toISOString(),
-      })
+    const atualizada = await pb.collection('manutencoes').update<Manutencao>(manutencao.id, {
+      situacao: 'retornado',
+      data_retorno: new Date().toISOString(),
+    })
 
     await pb.collection('dispositivos').update(manutencao.dispositivo, {
       status: novoStatus,

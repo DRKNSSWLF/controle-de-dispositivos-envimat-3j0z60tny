@@ -66,7 +66,7 @@ const TARGET_FIELDS = [
   },
   {
     key: 'status',
-    label: 'Status (em_uso, backup, manutencao)',
+    label: 'Status (em_uso, disponivel, manutencao)',
     aliases: ['status', 'situacao', 'estado'],
   },
   {
@@ -145,7 +145,7 @@ export function ImportarDispositivos({
       'tipo,fabricante,modelo,numero_serie,imei1,imei2,colaborador,status,data_aquisicao,observacoes\n' +
       'celular,Samsung,Galaxy A55 5G,R58N4099XYZ,354928114999901,354928114999902,Carlos Eduardo Silva,em_uso,2023-05-15,Uso operacional no pátio\n' +
       'notebook,Lenovo,ThinkPad L14,PF4A992X,,,Mariana Alencar Ribeiro,em_uso,2022-09-10,Notebook Engenharia\n' +
-      'tablet,Apple,iPad 10ª Geração,DMPG7731XYZ,354019284999111,,,backup,2024-02-01,Reserva técnica sede São Carlos\n' +
+      'tablet,Apple,iPad 10ª Geração,DMPG7731XYZ,354019284999111,,,disponivel,2024-02-01,Reserva técnica sede São Carlos\n' +
       'celular,Motorola,Moto G54 5G,ZY22HG9P99,356789012999777,356789012999778,,manutencao,2021-06-20,Aguardando troca de tela'
 
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -226,7 +226,7 @@ export function ImportarDispositivos({
 
       // Status
       const rawStatus = (mapping.status ? row[mapping.status] : '').toLowerCase()
-      let status: StatusDispositivo = 'backup'
+      let status: StatusDispositivo = 'disponivel'
       if (rawStatus.includes('uso') || colaboradorId) status = 'em_uso'
       else if (
         rawStatus.includes('manut') ||
@@ -237,9 +237,10 @@ export function ImportarDispositivos({
       else if (
         rawStatus.includes('backup') ||
         rawStatus.includes('reserva') ||
-        rawStatus.includes('estoque')
+        rawStatus.includes('estoque') ||
+        rawStatus.includes('disponivel')
       )
-        status = 'backup'
+        status = 'disponivel'
 
       const dataAquisicao = mapping.data_aquisicao ? row[mapping.data_aquisicao] : ''
       const observacoes = mapping.observacoes

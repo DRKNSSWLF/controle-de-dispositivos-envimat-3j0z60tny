@@ -57,7 +57,7 @@ export function VisaoGeralInventario({
         </div>
       )}
 
-      {/* Cartões Principais de Status: Total, Em Uso, Backup, Manutenção e Idade */}
+      {/* Cartões Principais de Status: Total, Em Uso, Disponível, Manutenção e Idade */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
         {/* Total */}
         <Card
@@ -95,20 +95,18 @@ export function VisaoGeralInventario({
           </CardContent>
         </Card>
 
-        {/* Backup */}
+        {/* Disponível */}
         <Card
-          onClick={() => onFiltrarStatus?.('backup')}
+          onClick={() => onFiltrarStatus?.('disponivel')}
           className="bg-white border-emerald-100 hover:border-emerald-300 transition-all rounded-2xl cursor-pointer shadow-sm hover:shadow"
         >
           <CardContent className="p-4">
             <div className="flex items-center justify-between text-emerald-800/80 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                Backup / Reserva
-              </span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Disponível</span>
               <Archive className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-3xl font-serif italic text-emerald-950 font-normal">
-              {stats.backup}
+              {stats.disponivel}
             </div>
             <p className="text-[11px] text-emerald-700/80 mt-1">Prontos para substituição</p>
           </CardContent>

@@ -37,6 +37,7 @@ interface SecaoManutencaoProps {
 export function SecaoManutencao({
   manutencoes,
   dispositivos,
+  colaboradores,
   vinculos,
   onAtualizar,
 }: SecaoManutencaoProps) {

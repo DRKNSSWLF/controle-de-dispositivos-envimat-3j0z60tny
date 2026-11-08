@@ -45,8 +45,6 @@ function camposDoDispositivo(d: Dispositivo): CampoContrato[] {
       ...base,
       { rotulo: 'Processador', valor: d.processador || '-' },
       { rotulo: 'Armazenamento', valor: d.armazenamento_interno || '-' },
-      { rotulo: 'IMEI 1', valor: d.imei1 || '-' },
-      { rotulo: 'IMEI 2', valor: d.imei2 || '-' },
       { rotulo: 'Número de Série', valor: d.numero_serie || '-' },
     ]
   }

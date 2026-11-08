@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale'
 export interface InventarioEstatisticas {
   total: number
   emUso: number
-  backup: number
+  disponivel: number
   manutencao: number
   porTipo: {
     celular: number
@@ -22,7 +22,7 @@ export interface InventarioEstatisticas {
 export function calcularEstatisticas(dispositivos: Dispositivo[]): InventarioEstatisticas {
   const total = dispositivos.length
   let emUso = 0
-  let backup = 0
+  let disponivel = 0
   let manutencao = 0
 
   const porTipo = {
@@ -43,7 +43,7 @@ export function calcularEstatisticas(dispositivos: Dispositivo[]): InventarioEst
   dispositivos.forEach((d) => {
     // Status
     if (d.status === 'em_uso') emUso++
-    else if (d.status === 'backup') backup++
+    else if (d.status === 'disponivel') disponivel++
     else if (d.status === 'manutencao') manutencao++
 
     // Tipo
@@ -92,7 +92,7 @@ export function calcularEstatisticas(dispositivos: Dispositivo[]): InventarioEst
   return {
     total,
     emUso,
-    backup,
+    disponivel,
     manutencao,
     porTipo,
     idadeMediaAnos,

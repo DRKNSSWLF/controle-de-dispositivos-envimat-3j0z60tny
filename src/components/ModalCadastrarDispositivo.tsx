@@ -269,7 +269,7 @@ export function ModalCadastrarDispositivo({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="em_uso">Em uso (entregue ao colaborador)</SelectItem>
-                  <SelectItem value="backup">Backup / Reserva técnica</SelectItem>
+                  <SelectItem value="disponivel">Disponível (reserva técnica / estoque)</SelectItem>
                   <SelectItem value="manutencao">Em Manutenção / Oficina</SelectItem>
                 </SelectContent>
               </Select>
