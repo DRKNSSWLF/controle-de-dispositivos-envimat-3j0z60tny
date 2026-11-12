@@ -57,6 +57,20 @@ export const usuariosService = {
   async alterarNivel(id: string, nivel: NivelAcesso): Promise<void> {
     await pb.collection('users').update(id, { nivel })
   },
+
+  /**
+   * Troca a senha de um usuário.
+   * - Master redefinindo a senha de OUTRO usuário: envia apenas a nova senha.
+   * - Usuário trocando a PRÓPRIA senha: a API exige a senha atual (oldPassword).
+   */
+  async trocarSenha(id: string, novaSenha: string, senhaAtual?: string): Promise<void> {
+    const dados: Record<string, string> = {
+      password: novaSenha,
+      passwordConfirm: novaSenha,
+    }
+    if (senhaAtual) dados.oldPassword = senhaAtual
+    await pb.collection('users').update(id, dados)
+  },
 }
 
 export const logsService = {

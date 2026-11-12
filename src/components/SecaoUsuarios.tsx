@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { usuariosService, type ContaUsuario } from '@/services/adminService'
 import { useAuth } from '@/lib/auth'
-import { UserPlus, ShieldCheck, Shield, RefreshCw, AlertCircle } from 'lucide-react'
+import { UserPlus, ShieldCheck, Shield, RefreshCw, AlertCircle, KeyRound } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 const DOMINIO_EMPRESA = '@envimat.com.br'
@@ -44,6 +44,12 @@ export function SecaoUsuarios() {
   const [email, setEmail] = useState('')
   const [nivel, setNivel] = useState<string>('admin')
   const [senha, setSenha] = useState('')
+
+  // Troca/redefinição de senha (Bug 3)
+  const [alvoSenha, setAlvoSenha] = useState<ContaUsuario | null>(null)
+  const [novaSenha, setNovaSenha] = useState('')
+  const [senhaAtual, setSenhaAtual] = useState('')
+  const [salvandoSenha, setSalvandoSenha] = useState(false)
 
   const carregar = async () => {
     setCarregando(true)
@@ -113,6 +119,52 @@ export function SecaoUsuarios() {
       })
     } finally {
       setSalvando(false)
+    }
+  }
+
+  const abrirTrocaSenha = (usuario: ContaUsuario) => {
+    setAlvoSenha(usuario)
+    setNovaSenha('')
+    setSenhaAtual('')
+  }
+
+  const trocarSenha = async () => {
+    if (!alvoSenha) return
+    const ehProprio = alvoSenha.id === usuarioLogado?.id
+    if (novaSenha.length < 8) {
+      toast({
+        title: 'Senha muito curta',
+        description: 'A nova senha deve ter pelo menos 8 caracteres.',
+        variant: 'destructive',
+      })
+      return
+    }
+    if (ehProprio && !senhaAtual) {
+      toast({
+        title: 'Informe a senha atual',
+        description: 'Para trocar a própria senha é necessário confirmar a atual.',
+        variant: 'destructive',
+      })
+      return
+    }
+    setSalvandoSenha(true)
+    try {
+      await usuariosService.trocarSenha(alvoSenha.id, novaSenha, ehProprio ? senhaAtual : undefined)
+      toast({
+        title: 'Senha atualizada',
+        description: ehProprio
+          ? 'Sua senha foi trocada com sucesso.'
+          : `A senha de ${alvoSenha.nome} foi redefinida. Compartilhe por um canal seguro.`,
+      })
+      setAlvoSenha(null)
+    } catch (e) {
+      toast({
+        title: 'Erro ao trocar senha',
+        description: e instanceof Error ? e.message : 'Tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setSalvandoSenha(false)
     }
   }
 
@@ -307,6 +359,16 @@ export function SecaoUsuarios() {
                         ))}
                       </SelectContent>
                     </Select>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => abrirTrocaSenha(u)}
+                      className="border-emerald-200 text-emerald-800 hover:bg-emerald-50 rounded-xl h-9 text-xs shrink-0"
+                      title={ehProprio ? 'Trocar minha senha' : 'Redefinir a senha deste usuário'}
+                    >
+                      <KeyRound className="w-3.5 h-3.5 sm:mr-1.5" />
+                      <span className="hidden lg:inline">Senha</span>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -314,6 +376,67 @@ export function SecaoUsuarios() {
           })
         )}
       </div>
+
+      {/* Diálogo de troca/redefinição de senha */}
+      <Dialog
+        open={alvoSenha !== null}
+        onOpenChange={(aberto) => {
+          if (!aberto) setAlvoSenha(null)
+        }}
+      >
+        <DialogContent className="rounded-2xl border-emerald-100 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif italic text-xl text-emerald-950">
+              {alvoSenha?.id === usuarioLogado?.id ? 'Trocar minha senha' : 'Redefinir senha'}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-emerald-700/80">
+              {alvoSenha?.id === usuarioLogado?.id
+                ? 'Para trocar a própria senha, confirme a atual e defina a nova.'
+                : `Defina uma nova senha para ${alvoSenha?.nome || 'o usuário'} (${alvoSenha?.email || ''}).`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {alvoSenha?.id === usuarioLogado?.id && (
+              <div className="space-y-1">
+                <Label className="text-xs text-emerald-800">Senha atual</Label>
+                <Input
+                  type="password"
+                  value={senhaAtual}
+                  onChange={(e) => setSenhaAtual(e.target.value)}
+                  placeholder="Sua senha atual"
+                  className="rounded-xl border-emerald-200 text-sm"
+                />
+              </div>
+            )}
+            <div className="space-y-1">
+              <Label className="text-xs text-emerald-800">Nova senha</Label>
+              <Input
+                type="text"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                placeholder="Mínimo de 8 caracteres"
+                className="rounded-xl border-emerald-200 text-sm"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setAlvoSenha(null)}
+                className="rounded-xl border-emerald-200 text-emerald-800 text-sm"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={trocarSenha}
+                disabled={salvandoSenha}
+                className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm"
+              >
+                {salvandoSenha ? 'Salvando...' : 'Salvar nova senha'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

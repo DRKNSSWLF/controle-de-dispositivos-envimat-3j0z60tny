@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-12T19:10:42.374Z",
+  "generatedAt": "2026-11-12T19:36:48.968Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
+        "list": "@request.auth.nivel = \"master\" || id = @request.auth.id",
+        "view": "@request.auth.nivel = \"master\" || id = @request.auth.id",
         "create": "@request.auth.nivel = \"master\"",
         "update": "@request.auth.nivel = \"master\" || (id = @request.auth.id && @request.body.nivel:isset = false && @request.body.verified:isset = false)",
         "delete": "@request.auth.nivel = \"master\" && id != @request.auth.id"
@@ -728,8 +728,8 @@
       "name": "logs_acesso",
       "type": "base",
       "apiRules": {
-        "list": null,
-        "view": null,
+        "list": "@request.auth.nivel = \"master\"",
+        "view": "@request.auth.nivel = \"master\"",
         "create": null,
         "update": null,
         "delete": null
