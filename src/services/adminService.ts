@@ -23,7 +23,13 @@ export interface LogAcesso {
 }
 
 function mapearConta(m: any): ContaUsuario {
-  return { id: m.id, email: m.email, nome: m.name || m.email, nivel: m.nivel === 'admin' ? 'admin' : 'master', created: m.created }
+  return {
+    id: m.id,
+    email: m.email,
+    nome: m.name || m.email,
+    nivel: m.nivel === 'admin' ? 'admin' : 'master',
+    created: m.created,
+  }
 }
 
 export const usuariosService = {
@@ -32,7 +38,12 @@ export const usuariosService = {
     return r.map(mapearConta)
   },
 
-  async criar(nome: string, email: string, nivel: NivelAcesso, senha: string): Promise<ContaUsuario> {
+  async criar(
+    nome: string,
+    email: string,
+    nivel: NivelAcesso,
+    senha: string,
+  ): Promise<ContaUsuario> {
     const r = await pb.collection('users').create({
       name: nome,
       email: email.trim().toLowerCase(),

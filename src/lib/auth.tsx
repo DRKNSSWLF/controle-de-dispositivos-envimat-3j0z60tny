@@ -1,96 +1,86 @@
-import { useState, useEffect, createContext, useContext, type ReactNode } from 'react'
-import pb from '@/lib/pocketbase/client'
-import type { NivelAcesso } from '@/types/inventory'
-
-export interface UsuarioLogado {
-  id: string
-  email: string
-  nome: string
-  nivel: NivelAcesso
-}
-
-interface AuthContexto {
-  usuario: UsuarioLogado | null
-  ehMaster: boolean
-  carregando: boolean
-  entrar: (email: string, senha: string) => Promise<void>
-  sair: () => void
-  trocarSenha: (senhaAtual: string, novaSenha: string) => Promise<void>
-  recarregar: () => Promise<void>
-}
-
-const AuthContext = createContext<AuthContexto | null>(null)
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import client from '@/lib/pocketbase/client'
 
 export const DOMINIO_EMPRESA = '@envimat.com.br'
 
 export const emailCorporativoValido = (email: string) =>
   email.trim().toLowerCase().endsWith(DOMINIO_EMPRESA)
 
-function mapearUsuario(model: any): UsuarioLogado {
+export type NivelPermissao = 'master' | 'admin'
+
+export interface UsuarioLogado {
+  id: string
+  nome: string
+  email: string
+  nivel: NivelPermissao
+}
+
+interface AuthContexto {
+  usuario: UsuarioLogado | null
+  carregando: boolean
+  entrar: (email: string, senha: string) => Promise<void>
+  sair: () => void
+  ehMaster: boolean
+}
+
+const AuthContext = createContext<AuthContexto | undefined>(undefined)
+
+function usuarioDoAuthRecord(): UsuarioLogado | null {
+  const rec = client.authStore.record
+  if (!rec || !rec.id) return null
   return {
-    id: model.id,
-    email: model.email,
-    nome: model.name || model.email,
-    nivel: model.nivel === 'admin' ? 'admin' : 'master',
+    id: rec.id as string,
+    nome: (rec.name as string) || (rec.email as string) || '',
+    email: (rec.email as string) || '',
+    nivel: ((rec.nivel as string) === 'master' ? 'master' : 'admin') as NivelPermissao,
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [usuario, setUsuario] = useState<UsuarioLogado | null>(null)
+  const [usuario, setUsuario] = useState<UsuarioLogado | null>(() => usuarioDoAuthRecord())
   const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
-    if (pb.authStore.isValid) {
-      setUsuario(mapearUsuario(pb.authStore.record))
+    // Valida a sessão armazenada; se o token expirou, limpa.
+    if (client.authStore.isValid) {
+      client
+        .collection('users')
+        .authRefresh()
+        .then(() => setUsuario(usuarioDoAuthRecord()))
+        .catch(() => {
+          client.authStore.clear()
+          setUsuario(null)
+        })
+        .finally(() => setCarregando(false))
+    } else {
+      client.authStore.clear()
+      setCarregando(false)
     }
-    setCarregando(false)
-    const unsubscribe = pb.authStore.onChange(() => {
-      setUsuario(pb.authStore.isValid ? mapearUsuario(pb.authStore.record) : null)
+  }, [])
+
+  useEffect(() => {
+    const desinscrever = client.authStore.onChange(() => {
+      setUsuario(usuarioDoAuthRecord())
     })
-    return unsubscribe
+    return desinscrever
   }, [])
 
   const entrar = async (email: string, senha: string) => {
     if (!emailCorporativoValido(email)) {
-      throw new Error(
-        `Acesso permitido apenas para e-mails corporativos ${DOMINIO_EMPRESA}. Não há auto-cadastro: procure o nível Master.`,
-      )
+      throw new Error('Acesso permitido apenas para e-mails corporativos @envimat.com.br.')
     }
-    await pb.collection('users').authWithPassword(email.trim().toLowerCase(), senha)
+    // Em caso de falha o PocketBase lança erro 400 ("Failed to authenticate.")
+    // e o hook servidor registra o log de falha.
+    await client.collection('users').authWithPassword(email.trim().toLowerCase(), senha)
   }
 
-  const sair = () => pb.authStore.clear()
-
-  const trocarSenha = async (senhaAtual: string, novaSenha: string) => {
-    if (!usuario) throw new Error('Usuário não autenticado.')
-    await pb.collection('users').update(usuario.id, {
-      password: novaSenha,
-      oldPassword: senhaAtual,
-      passwordConfirm: novaSenha,
-    })
-  }
-
-  const recarregar = async () => {
-    if (!usuario) return
-    try {
-      const r = await pb.collection('users').getOne(usuario.id)
-      setUsuario(mapearUsuario(r))
-    } catch {
-      /* sessão ainda válida; ignora falha de leitura */
-    }
+  const sair = () => {
+    client.authStore.clear()
   }
 
   return (
     <AuthContext.Provider
-      value={{
-        usuario,
-        ehMaster: usuario?.nivel === 'master',
-        carregando,
-        entrar,
-        sair,
-        trocarSenha,
-        recarregar,
-      }}
+      value={{ usuario, carregando, entrar, sair, ehMaster: usuario?.nivel === 'master' }}
     >
       {children}
     </AuthContext.Provider>

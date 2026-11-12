@@ -34,7 +34,8 @@ export function validarCNPJ(valor: string): boolean {
   if (cnpj.length !== 14) return false
   if (/^(\d)\1{13}$/.test(cnpj)) return false // sequências iguais são inválidas
   const calc = (base: number): number => {
-    const pesos = base === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    const pesos =
+      base === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
     let soma = 0
     for (let i = 0; i < base; i++) soma += parseInt(cnpj[i], 10) * pesos[i]
     const resto = soma % 11
@@ -56,10 +57,7 @@ export function mascaraCNPJ(valor: string): string {
 }
 
 /** Mensagem para exibição em formulário; null quando válido/preenchido parcialmente */
-export function mensagemValidacaoDocumento(
-  tipo: 'cpf' | 'cnpj',
-  valor: string,
-): string | null {
+export function mensagemValidacaoDocumento(tipo: 'cpf' | 'cnpj', valor: string): string | null {
   const d = DIGITOS(valor)
   if (!d) return null
   if (tipo === 'cpf') {
@@ -71,10 +69,7 @@ export function mensagemValidacaoDocumento(
 }
 
 /** Bloqueia o salvamento quando o documento está preenchido e inválido */
-export function documentoBloqueiaSalvamento(
-  tipo: 'cpf' | 'cnpj',
-  valor: string,
-): boolean {
+export function documentoBloqueiaSalvamento(tipo: 'cpf' | 'cnpj', valor: string): boolean {
   const d = DIGITOS(valor)
   if (!d) return false
   if (tipo === 'cpf') return d.length >= 11 && !validarCPF(d)

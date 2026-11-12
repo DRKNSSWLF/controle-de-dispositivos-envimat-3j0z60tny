@@ -184,10 +184,18 @@ migrate(
   },
   (db) => {
     // Rollback
-    try { db.deleteCollection('vinculos_linhas') } catch (e) {}
-    try { db.deleteCollection('linhas_telefonicas') } catch (e) {}
-    try { db.deleteCollection('tipos_dispositivo') } catch (e) {}
-    try { db.deleteCollection('logs_acesso') } catch (e) {}
+    try {
+      db.deleteCollection('vinculos_linhas')
+    } catch (e) {}
+    try {
+      db.deleteCollection('linhas_telefonicas')
+    } catch (e) {}
+    try {
+      db.deleteCollection('tipos_dispositivo')
+    } catch (e) {}
+    try {
+      db.deleteCollection('logs_acesso')
+    } catch (e) {}
     const contratos = db.findCollectionByNameOrId('contratos')
     try {
       contratos.fields.removeByName('anexo_assinado')

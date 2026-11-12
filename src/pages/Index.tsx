@@ -32,6 +32,9 @@ import { ImportarDispositivos } from '@/components/ImportarDispositivos'
 import { ImportarColaboradores } from '@/components/ImportarColaboradores'
 import { PainelAlertas } from '@/components/PainelAlertas'
 import { ModalCadastrarDispositivo } from '@/components/ModalCadastrarDispositivo'
+import { SecaoUsuarios } from '@/components/SecaoUsuarios'
+import { SecaoLogs } from '@/components/SecaoLogs'
+import { useAuth } from '@/lib/auth'
 import {
   Smartphone,
   Users,
@@ -47,10 +50,15 @@ import {
   FileText,
   Wrench,
   History,
+  UserCog,
+  ScrollText,
+  LogOut,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 export default function Index() {
+  const { usuario, sair } = useAuth()
+  const ehMaster = usuario?.nivel === 'master'
   const [abaAtiva, setAbaAtiva] = useState<string>('geral')
   const [subAbaImportacao, setSubAbaImportacao] = useState<'dispositivos' | 'colaboradores'>(
     'dispositivos',
@@ -197,6 +205,27 @@ export default function Index() {
                 </Button>
               }
             />
+
+            <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-emerald-200">
+              <div className="text-right hidden md:block">
+                <p className="text-xs font-semibold text-emerald-950 leading-tight">
+                  {usuario?.nome}
+                </p>
+                <p className="text-[10px] uppercase tracking-wide text-emerald-700/70">
+                  {usuario?.nivel === 'master' ? 'Master' : 'Administrativo'}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={sair}
+                className="border-emerald-200 text-emerald-800 hover:bg-emerald-50 rounded-xl h-9"
+                title="Encerrar sessão"
+              >
+                <LogOut className="w-3.5 h-3.5 sm:mr-1.5" />
+                <span className="hidden sm:inline">Sair</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -309,6 +338,26 @@ export default function Index() {
                   </Badge>
                 )}
               </TabsTrigger>
+
+              {ehMaster && (
+                <TabsTrigger
+                  value="usuarios"
+                  className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+                >
+                  <UserCog className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Usuários</span>
+                </TabsTrigger>
+              )}
+
+              {ehMaster && (
+                <TabsTrigger
+                  value="logs"
+                  className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+                >
+                  <ScrollText className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Logs de Acesso</span>
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
@@ -471,6 +520,20 @@ export default function Index() {
               onIrParaInventario={() => setAbaAtiva('dispositivos')}
             />
           </TabsContent>
+
+          {/* 11. ABA: USUÁRIOS (somente Master) */}
+          {ehMaster && (
+            <TabsContent value="usuarios" className="space-y-6 focus-visible:outline-none">
+              <SecaoUsuarios />
+            </TabsContent>
+          )}
+
+          {/* 12. ABA: LOGS DE ACESSO (somente Master) */}
+          {ehMaster && (
+            <TabsContent value="logs" className="space-y-6 focus-visible:outline-none">
+              <SecaoLogs />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

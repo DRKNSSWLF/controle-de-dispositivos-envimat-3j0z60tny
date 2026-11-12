@@ -54,7 +54,9 @@ export function validarCPF(valor: string): boolean {
     const resto = (soma * 10) % 11
     return resto === 10 ? 0 : resto
   }
-  return calcular(cpf.slice(0, 9)) === Number(cpf[9]) && calcular(cpf.slice(0, 10)) === Number(cpf[10])
+  return (
+    calcular(cpf.slice(0, 9)) === Number(cpf[9]) && calcular(cpf.slice(0, 10)) === Number(cpf[10])
+  )
 }
 
 /** Válido para submissão: pode ficar em branco (campo opcional). */

@@ -71,7 +71,9 @@ export const linhasService = {
   },
 
   async limparDadosDemo(): Promise<number> {
-    const r = await pb.collection('linhas_telefonicas').getFullList({ filter: 'is_demo=true', requestKey: null })
+    const r = await pb
+      .collection('linhas_telefonicas')
+      .getFullList({ filter: 'is_demo=true', requestKey: null })
     for (const item of r) await pb.collection('linhas_telefonicas').delete(item.id)
     return r.length
   },
