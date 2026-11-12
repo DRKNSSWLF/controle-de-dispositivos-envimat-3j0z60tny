@@ -11,7 +11,10 @@ export interface TipoDispositivoCadastrado {
   usa_imei: boolean
 }
 
-const BASE = '/backend/v1/envimat/tipos-dispositivo'
+// O frontend é estático e NÃO faz proxy de /backend: as rotas do hook só existem
+// no host do PocketBase (VITE_POCKETBASE_URL). Caminho relativo devolve o
+// index.html da SPA → "Unexpected token '<'" ao tentar parsear JSON.
+const BASE = `${import.meta.env.VITE_POCKETBASE_URL}/backend/v1/envimat/tipos-dispositivo`
 
 async function request<T>(url: string, opcoes?: RequestInit): Promise<T> {
   const resposta = await fetch(url, opcoes)
