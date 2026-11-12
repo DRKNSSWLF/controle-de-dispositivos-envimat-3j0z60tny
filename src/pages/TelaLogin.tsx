@@ -2,11 +2,25 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Leaf, Lock, Mail, ShieldCheck, AlertCircle } from 'lucide-react'
-import { useAuth } from '@/lib/auth'
+import {
+  Leaf,
+  Lock,
+  Mail,
+  ShieldCheck,
+  AlertCircle,
+  KeyRound,
+  ArrowLeft,
+  MailCheck,
+} from 'lucide-react'
+import { useAuth, DOMINIO_EMPRESA } from '@/lib/auth'
+import { pb } from '@/lib/pocketbase/client'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
+
+type Visao = 'login' | 'esqueci' | 'esqueci-enviado'
 
 export default function TelaLogin() {
   const { entrar } = useAuth()
+  const [visao, setVisao] = useState<Visao>('login')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -34,6 +48,33 @@ export default function TelaLogin() {
     }
   }
 
+  const pedirRedefinicao = async (e: FormEvent) => {
+    e.preventDefault()
+    setErro(null)
+
+    const emailTrim = email.trim().toLowerCase()
+    if (!emailTrim || !emailTrim.endsWith('@' + DOMINIO_EMPRESA)) {
+      setErro(`Informe um e-mail corporativo @${DOMINIO_EMPRESA}.`)
+      return
+    }
+
+    setEnviando(true)
+    try {
+      await pb.collection('usuarios').requestPasswordReset(emailTrim)
+      setVisao('esqueci-enviado')
+    } catch (err) {
+      // Não revela se o e-mail existe ou não — mensagem amigável em ambos os casos.
+      const detalhe = getErrorMessage(err)
+      setErro(
+        detalhe ||
+          'Não foi possível enviar o e-mail de redefinição agora. Tente novamente em instantes.',
+      )
+      return
+    } finally {
+      setEnviando(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fafcf9] via-emerald-50 to-emerald-100 p-4">
       <div className="w-full max-w-md">
@@ -54,60 +95,163 @@ export default function TelaLogin() {
             </p>
           </div>
 
-          <form onSubmit={submeter} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="login-email" className="text-xs font-medium text-emerald-900">
-                E-mail corporativo
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400" />
-                <Input
-                  id="login-email"
-                  type="email"
-                  autoComplete="username"
-                  placeholder="nome@envimat.com.br"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-9 rounded-xl border-emerald-200 focus-visible:ring-emerald-600"
-                  disabled={enviando}
-                />
+          {visao === 'esqueci-enviado' ? (
+            <div className="space-y-5 text-center">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                <MailCheck className="w-7 h-7 text-emerald-700" />
               </div>
+              <div className="space-y-1.5">
+                <h2 className="font-serif italic text-xl text-emerald-950">Verifique seu e-mail</h2>
+                <p className="text-xs text-emerald-800/80 leading-relaxed">
+                  Se existir uma conta para <strong>{email}</strong>, você receberá em instantes um
+                  link para definir uma nova senha. O link vale por pouco tempo — se não chegar,
+                  verifique a caixa de spam ou tente novamente.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setVisao('login')
+                  setErro(null)
+                }}
+                className="w-full rounded-xl border-emerald-200 text-emerald-800 hover:bg-emerald-50"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar para o login
+              </Button>
             </div>
+          ) : visao === 'esqueci' ? (
+            <form onSubmit={pedirRedefinicao} className="space-y-4">
+              <div className="space-y-1.5">
+                <h2 className="font-serif italic text-xl text-emerald-950 flex items-center gap-2">
+                  <KeyRound className="w-5 h-5 text-emerald-700" />
+                  Esqueci minha senha
+                </h2>
+                <p className="text-xs text-emerald-700/80 leading-relaxed">
+                  Informe o e-mail corporativo e enviaremos um link para você definir uma nova
+                  senha.
+                </p>
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="login-senha" className="text-xs font-medium text-emerald-900">
-                Senha
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400" />
-                <Input
-                  id="login-senha"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  className="pl-9 rounded-xl border-emerald-200 focus-visible:ring-emerald-600"
+              <div className="space-y-1.5">
+                <Label htmlFor="reset-email" className="text-xs font-medium text-emerald-900">
+                  E-mail corporativo
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400" />
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    autoComplete="username"
+                    placeholder={`nome@${DOMINIO_EMPRESA}`}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-9 rounded-xl border-emerald-200 focus-visible:ring-emerald-600"
+                    disabled={enviando}
+                  />
+                </div>
+              </div>
+
+              {erro && (
+                <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 p-3">
+                  <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                  <p className="text-xs text-red-700 leading-relaxed">{erro}</p>
+                </div>
+              )}
+
+              <div className="space-y-2 pt-1">
+                <Button
+                  type="submit"
                   disabled={enviando}
-                />
+                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11"
+                >
+                  {enviando ? 'Enviando...' : 'Enviar link de redefinição'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setVisao('login')
+                    setErro(null)
+                  }}
+                  className="w-full rounded-xl text-emerald-800 hover:bg-emerald-50"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar para o login
+                </Button>
               </div>
-            </div>
+            </form>
+          ) : (
+            <>
+              <form onSubmit={submeter} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-email" className="text-xs font-medium text-emerald-900">
+                    E-mail corporativo
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400" />
+                    <Input
+                      id="login-email"
+                      type="email"
+                      autoComplete="username"
+                      placeholder="nome@envimat.com.br"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-9 rounded-xl border-emerald-200 focus-visible:ring-emerald-600"
+                      disabled={enviando}
+                    />
+                  </div>
+                </div>
 
-            {erro && (
-              <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 p-3">
-                <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
-                <p className="text-xs text-red-700 leading-relaxed">{erro}</p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-senha" className="text-xs font-medium text-emerald-900">
+                    Senha
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400" />
+                    <Input
+                      id="login-senha"
+                      type="password"
+                      autoComplete="current-password"
+                      placeholder="••••••••"
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="pl-9 rounded-xl border-emerald-200 focus-visible:ring-emerald-600"
+                      disabled={enviando}
+                    />
+                  </div>
+                </div>
+
+                {erro && (
+                  <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 p-3">
+                    <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                    <p className="text-xs text-red-700 leading-relaxed">{erro}</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={enviando}
+                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11"
+                >
+                  {enviando ? 'Entrando...' : 'Entrar'}
+                </Button>
+              </form>
+
+              <div className="mt-4 text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVisao('esqueci')
+                    setErro(null)
+                  }}
+                  className="text-xs text-emerald-700 hover:text-emerald-900 underline underline-offset-2"
+                >
+                  Esqueci minha senha
+                </button>
               </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={enviando}
-              className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11"
-            >
-              {enviando ? 'Entrando...' : 'Entrar'}
-            </Button>
-          </form>
+            </>
+          )}
 
           <p className="mt-6 text-center text-[11px] text-emerald-700/60 leading-relaxed">
             Não há auto-cadastro. Para obter acesso, procure um usuário com nível{' '}
