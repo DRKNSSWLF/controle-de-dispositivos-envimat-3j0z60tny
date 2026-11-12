@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Colaborador, Dispositivo } from '@/types/inventory'
-import { ModalCadastrarColaborador } from './ModalCadastrarColaborador'
+
 import {
   User,
   Smartphone,
@@ -17,6 +17,7 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { colaboradoresService, vinculosService } from '@/services/inventoryService'
+import { vinculosLinhasService } from '@/services/linhasService'
 import { LABEL_STATUS_COLABORADOR } from '@/lib/labels'
 import { toast } from '@/hooks/use-toast'
 
@@ -76,6 +77,15 @@ export function SecaoColaboradores({
         for (const v of doColab) {
           await vinculosService.encerrar(v, 'Desligamento do colaborador da empresa')
         }
+        // Encerra também os vínculos ATIVOS de LINHAS TELEFÔNICAS (sem exclusão).
+        const linhasEncerradas = await vinculosLinhasService.encerrarTodosDoColaborador(c.id)
+        if (linhasEncerradas > 0) {
+          toast({
+            title: `${linhasEncerradas} linha(s) telefônica(s) encerrada(s)`,
+            description:
+              'Os vínculos de linhas do colaborador foram encerrados (histórico mantido).',
+          })
+        }
       }
       await colaboradoresService.atualizar(c.id, { status: novoStatus })
       toast({
@@ -126,7 +136,6 @@ export function SecaoColaboradores({
               className="pl-10 rounded-xl border-emerald-200 focus:ring-emerald-600 bg-emerald-50/20 text-sm"
             />
           </div>
-          <ModalCadastrarColaborador onColaboradorSalvo={onAtualizar} />
         </CardContent>
       </Card>
 

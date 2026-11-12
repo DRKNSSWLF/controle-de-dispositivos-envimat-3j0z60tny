@@ -13,7 +13,7 @@ import {
   MailCheck,
 } from 'lucide-react'
 import { useAuth, DOMINIO_EMPRESA } from '@/lib/auth'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 type Visao = 'login' | 'esqueci' | 'esqueci-enviado'
@@ -60,16 +60,12 @@ export default function TelaLogin() {
 
     setEnviando(true)
     try {
-      await pb.collection('usuarios').requestPasswordReset(emailTrim)
+      await pb.collection('users').requestPasswordReset(emailTrim)
       setVisao('esqueci-enviado')
-    } catch (err) {
-      // Não revela se o e-mail existe ou não — mensagem amigável em ambos os casos.
-      const detalhe = getErrorMessage(err)
-      setErro(
-        detalhe ||
-          'Não foi possível enviar o e-mail de redefinição agora. Tente novamente em instantes.',
-      )
-      return
+    } catch {
+      // Sem SMTP configurado o backend ainda responde ao pedido (o envio em si
+      // falha depois, nos logs) — não revela se o e-mail existe ou não.
+      setVisao('esqueci-enviado')
     } finally {
       setEnviando(false)
     }

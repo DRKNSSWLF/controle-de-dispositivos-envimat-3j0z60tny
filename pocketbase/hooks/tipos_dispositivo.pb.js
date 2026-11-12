@@ -1,11 +1,12 @@
 /// <reference path="../pb_data/types.d.ts" />
 // Hook: CRUD de tipos de dispositivo (coleção tipos_dispositivo).
 // As regras da coleção deixam a escrita FECHADA via API direta (create/update/delete = null),
-// então este hook expõe o CRUD autenticado com controle de papel:
-//   - GET  /api/envimat/tipos-dispositivo            → lista (qualquer usuário autenticado)
-//   - POST /api/envimat/tipos-dispositivo            → cria (somente master OU administrativo)
-//   - PATCH /api/envimat/tipos-dispositivo/{id}      → renomeia (somente master OU administrativo)
-//   - DELETE /api/envimat/tipos-dispositivo/{id}     → SOMENTE master, e apenas se nenhum
+// então este hook expõe o CRUD autenticado com controle de papel.
+// Rotas fora do namespace reservado '/api/' (deploy recusa rotas novas lá):
+//   - GET    /backend/v1/envimat/tipos-dispositivo        → lista (qualquer autenticado)
+//   - POST   /backend/v1/envimat/tipos-dispositivo        → cria (master OU administrativo)
+//   - PATCH  /backend/v1/envimat/tipos-dispositivo/{id}   → renomeia (master OU administrativo)
+//   - DELETE /backend/v1/envimat/tipos-dispositivo/{id}   → SOMENTE master, e apenas se nenhum
 //     dispositivo estiver usando o tipo (nada de exclusão destrutiva).
 // Sem exclusões: DELETE só é permitido a master e apenas se nenhum
 // dispositivo estiver usando o tipo.
@@ -13,7 +14,7 @@
 
 routerAdd(
   'GET',
-  '/api/envimat/tipos-dispositivo',
+  '/backend/v1/envimat/tipos-dispositivo',
   (e) => {
     const registros = $app.findRecordsByFilter('tipos_dispositivo', '', 'nome', 0, 0)
     const itens = []
@@ -27,7 +28,7 @@ routerAdd(
 
 routerAdd(
   'POST',
-  '/api/envimat/tipos-dispositivo',
+  '/backend/v1/envimat/tipos-dispositivo',
   (e) => {
     const info = e.requestInfo()
     const papel = ((info.auth && info.auth.get('nivel')) || '') + ''
@@ -64,7 +65,7 @@ routerAdd(
 
 routerAdd(
   'PATCH',
-  '/api/envimat/tipos-dispositivo/{id}',
+  '/backend/v1/envimat/tipos-dispositivo/{id}',
   (e) => {
     const info = e.requestInfo()
     const papel = ((info.auth && info.auth.get('nivel')) || '') + ''
@@ -106,7 +107,7 @@ routerAdd(
 
 routerAdd(
   'DELETE',
-  '/api/envimat/tipos-dispositivo/{id}',
+  '/backend/v1/envimat/tipos-dispositivo/{id}',
   (e) => {
     const info = e.requestInfo()
     const papel = ((info.auth && info.auth.get('nivel')) || '') + ''

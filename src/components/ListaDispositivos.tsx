@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Dispositivo, Colaborador } from '@/types/inventory'
-import { ModalCadastrarDispositivo } from './ModalCadastrarDispositivo'
 import {
   Smartphone,
   Laptop,
@@ -207,10 +206,6 @@ export function ListaDispositivos({
                 className="pl-10 rounded-xl border-emerald-200 focus:ring-emerald-600 bg-emerald-50/20 text-sm"
               />
             </div>
-            <ModalCadastrarDispositivo
-              colaboradores={colaboradores}
-              onDispositivoSalvo={onAtualizar}
-            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 pt-1">
