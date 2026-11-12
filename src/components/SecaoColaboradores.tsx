@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Colaborador, Dispositivo } from '@/types/inventory'
+import { ModalCadastrarColaborador } from '@/components/ModalCadastrarColaborador'
 
 import {
   User,
@@ -15,6 +16,7 @@ import {
   ArrowRight,
   UserX,
   UserCheck,
+  Pencil,
 } from 'lucide-react'
 import { colaboradoresService, vinculosService } from '@/services/inventoryService'
 import { vinculosLinhasService } from '@/services/linhasService'
@@ -36,6 +38,7 @@ export function SecaoColaboradores({
 }: SecaoColaboradoresProps) {
   const [busca, setBusca] = useState('')
   const [alterandoStatus, setAlterandoStatus] = useState<string | null>(null)
+  const [editando, setEditando] = useState<Colaborador | null>(null)
 
   const dispositivosPorColab = (colaboradorId: string) => {
     return dispositivos.filter((d) => d.colaborador === colaboradorId && d.status === 'em_uso')
@@ -198,6 +201,16 @@ export function SecaoColaboradores({
 
                       <div className="flex items-center gap-2 shrink-0">
                         {badgeStatus(c.status)}
+                        {/* BOTÃO EDITAR CADASTRO (pré-preenchido, sem exclusão) */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditando(c)}
+                          title="Editar cadastro do colaborador"
+                          className="h-8 rounded-lg text-[11px] font-semibold border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                        >
+                          <Pencil className="w-3.5 h-3.5 mr-1" /> EDITAR
+                        </Button>
                         {/* BOTÃO DE ALTERAÇÃO DE STATUS (ATIVO <-> DESLIGADO) */}
                         <Button
                           variant="outline"
@@ -300,6 +313,15 @@ export function SecaoColaboradores({
           })
         )}
       </div>
+
+      {/* Modal de edição (pré-preenchido) — reutiliza o modal de cadastro */}
+      {editando && (
+        <ModalCadastrarColaborador
+          onColaboradorSalvo={onAtualizar}
+          colaboradorEmEdicao={editando}
+          onFechou={() => setEditando(null)}
+        />
+      )}
     </div>
   )
 }

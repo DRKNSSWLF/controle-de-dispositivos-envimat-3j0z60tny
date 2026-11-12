@@ -310,6 +310,39 @@ export const dispositivosService = {
       descricao: 'Dispositivo cadastrado no inventário.',
     })
 
+    // IMPORTAÇÃO: se o dispositivo já chega EM USO com colaborador responsável
+    // (planilha com coluna de colaborador), cria automaticamente o VÍNCULO
+    // ativo + contrato de comodato — sem isso a aba Vínculos ficava zerada
+    // (o status mudava, mas nenhum vínculo era registrado).
+    if (data.colaborador && data.status === 'em_uso') {
+      try {
+        await pb.collection('vinculos').create({
+          colaborador: data.colaborador,
+          dispositivo: criado.id,
+          data_inicio: payload.data_aquisicao || new Date().toISOString(),
+          situacao: 'ativo',
+          observacoes: 'Vínculo criado automaticamente na importação/cadastro do dispositivo.',
+        })
+        await pb.collection('contratos').create({
+          tipo: 'comodato',
+          dispositivo: criado.id,
+          colaborador: data.colaborador,
+          numero_vias: 2,
+          observacoes: 'Gerado automaticamente na importação/cadastro do dispositivo.',
+        })
+        await pb.collection('historico_movimentacoes').create({
+          dispositivo: criado.id,
+          colaborador: data.colaborador,
+          tipo_evento: 'vinculo',
+          descricao: 'Vínculo criado automaticamente na importação (dispositivo EM USO).',
+        })
+      } catch (e) {
+        // Vínculo é melhor-esforço na importação em lote: não derruba o cadastro
+        // do dispositivo, mas registra o problema na listagem de erros.
+        console.error('Falha ao criar vínculo automático do dispositivo', criado.id, e)
+      }
+    }
+
     return criado
   },
 

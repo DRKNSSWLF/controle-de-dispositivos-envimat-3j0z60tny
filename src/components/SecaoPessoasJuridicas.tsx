@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PessoaJuridica } from '@/types/inventory'
-import { Building2, Search, MapPin, Phone, Mail, User } from 'lucide-react'
+import { ModalCadastrarPessoaJuridica } from '@/components/ModalCadastrarPessoaJuridica'
+import { Building2, Search, MapPin, Phone, Mail, User, Pencil } from 'lucide-react'
 
 interface SecaoPessoasJuridicasProps {
   pessoasJuridicas: PessoaJuridica[]
@@ -11,9 +13,14 @@ interface SecaoPessoasJuridicasProps {
 }
 
 /** Listagem de Pessoas Jurídicas. O cadastro foi movido para a aba
- *  "Cadastros" do painel (ModalCadastrarPessoaJuridica). */
-export function SecaoPessoasJuridicas({ pessoasJuridicas }: SecaoPessoasJuridicasProps) {
+ *  "Cadastros" do painel (ModalCadastrarPessoaJuridica), reutilizado aqui
+ *  em modo EDIÇÃO pelo botão Editar de cada cartão. */
+export function SecaoPessoasJuridicas({
+  pessoasJuridicas,
+  onAtualizar,
+}: SecaoPessoasJuridicasProps) {
   const [busca, setBusca] = useState('')
+  const [editando, setEditando] = useState<PessoaJuridica | null>(null)
 
   const filtradas = pessoasJuridicas.filter((pj) => {
     if (!busca.trim()) return true
@@ -71,11 +78,23 @@ export function SecaoPessoasJuridicas({ pessoasJuridicas }: SecaoPessoasJuridica
                       <p className="text-xs text-emerald-700/80 font-mono">{pj.cnpj}</p>
                     </div>
                   </div>
-                  {pj.is_demo && (
-                    <Badge className="bg-emerald-100 text-emerald-800 rounded-full text-[10px]">
-                      Exemplo
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {pj.is_demo && (
+                      <Badge className="bg-emerald-100 text-emerald-800 rounded-full text-[10px]">
+                        Exemplo
+                      </Badge>
+                    )}
+                    {/* BOTÃO EDITAR CADASTRO (pré-preenchido, sem exclusão) */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditando(pj)}
+                      title="Editar cadastro da pessoa jurídica"
+                      className="h-8 rounded-lg text-[11px] font-semibold border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                    >
+                      <Pencil className="w-3.5 h-3.5 mr-1" /> EDITAR
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-1 text-xs text-emerald-900/80">
@@ -116,6 +135,15 @@ export function SecaoPessoasJuridicas({ pessoasJuridicas }: SecaoPessoasJuridica
           ))
         )}
       </div>
+
+      {/* Modal de edição (pré-preenchido) — reutiliza o modal de cadastro */}
+      {editando && (
+        <ModalCadastrarPessoaJuridica
+          onSalvo={onAtualizar}
+          pessoaEmEdicao={editando}
+          onFechou={() => setEditando(null)}
+        />
+      )}
     </div>
   )
 }
