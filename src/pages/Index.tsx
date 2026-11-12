@@ -10,14 +10,17 @@ import {
   historicoService,
   contratosService,
 } from '@/services/inventoryService'
+import { linhasService, vinculosLinhasService } from '@/services/linhasService'
 import {
   Colaborador,
   Contrato,
   Dispositivo,
   HistoricoMovimentacao,
+  LinhaTelefonica,
   Manutencao,
   PessoaJuridica,
   Vinculo,
+  VinculoLinha,
 } from '@/types/inventory'
 import { calcularEstatisticas, gerarAlertas } from '@/lib/alertsAndMetrics'
 import { VisaoGeralInventario } from '@/components/VisaoGeralInventario'
@@ -31,9 +34,10 @@ import { SecaoHistorico } from '@/components/SecaoHistorico'
 import { ImportarDispositivos } from '@/components/ImportarDispositivos'
 import { ImportarColaboradores } from '@/components/ImportarColaboradores'
 import { PainelAlertas } from '@/components/PainelAlertas'
-import { ModalCadastrarDispositivo } from '@/components/ModalCadastrarDispositivo'
 import { SecaoUsuarios } from '@/components/SecaoUsuarios'
 import { SecaoLogs } from '@/components/SecaoLogs'
+import { SecaoLinhas } from '@/components/SecaoLinhas'
+import { AreaCadastros } from '@/components/AreaCadastros'
 import { useAuth } from '@/lib/auth'
 import {
   Smartphone,
@@ -41,7 +45,6 @@ import {
   UploadCloud,
   BellRing,
   RotateCw,
-  Plus,
   Leaf,
   Layers,
   MapPin,
@@ -53,6 +56,8 @@ import {
   UserCog,
   ScrollText,
   LogOut,
+  PhoneCall,
+  FolderPlus,
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -71,6 +76,8 @@ export default function Index() {
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [manutencoes, setManutencoes] = useState<Manutencao[]>([])
   const [historico, setHistorico] = useState<HistoricoMovimentacao[]>([])
+  const [linhas, setLinhas] = useState<LinhaTelefonica[]>([])
+  const [vinculosLinhas, setVinculosLinhas] = useState<VinculoLinha[]>([])
   const [carregando, setCarregando] = useState<boolean>(true)
 
   // Filtros globais sincronizados
@@ -81,7 +88,7 @@ export default function Index() {
   const carregarDados = useCallback(async () => {
     try {
       setCarregando(true)
-      const [disps, colabs, pjs, vinc, contr, mant, hist] = await Promise.all([
+      const [disps, colabs, pjs, vinc, contr, mant, hist, lin, vincLin] = await Promise.all([
         dispositivosService.listar(),
         colaboradoresService.listar(),
         pessoasJuridicasService.listar(),
@@ -89,6 +96,8 @@ export default function Index() {
         contratosService.listar(),
         manutencoesService.listar(),
         historicoService.listar(),
+        linhasService.listar(),
+        vinculosLinhasService.listar(),
       ])
       setDispositivos(disps)
       setColaboradores(colabs)
@@ -97,6 +106,8 @@ export default function Index() {
       setContratos(contr)
       setManutencoes(mant)
       setHistorico(hist)
+      setLinhas(lin)
+      setVinculosLinhas(vincLin)
     } catch (err) {
       toast({
         title: 'Erro ao carregar dados',
@@ -195,17 +206,6 @@ export default function Index() {
               Atualizar
             </Button>
 
-            <ModalCadastrarDispositivo
-              colaboradores={colaboradores}
-              onDispositivoSalvo={carregarDados}
-              triggerButton={
-                <Button className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl shadow-sm h-9 text-xs">
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  Novo Dispositivo
-                </Button>
-              }
-            />
-
             <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-emerald-200">
               <div className="text-right hidden md:block">
                 <p className="text-xs font-semibold text-emerald-950 leading-tight">
@@ -286,6 +286,25 @@ export default function Index() {
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-semibold">
                   {colaboradores.length}
                 </span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="linhas"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Linhas Telefônicas</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-semibold">
+                  {linhas.length}
+                </span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="cadastros"
+                className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
+              >
+                <FolderPlus className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Cadastros</span>
               </TabsTrigger>
 
               <TabsTrigger
@@ -442,6 +461,21 @@ export default function Index() {
               onAtualizar={carregarDados}
               onFiltrarPorColaborador={handleFiltrarPorColaborador}
             />
+          </TabsContent>
+
+          {/* 6a. ABA: LINHAS TELEFÔNICAS */}
+          <TabsContent value="linhas" className="space-y-6 focus-visible:outline-none">
+            <SecaoLinhas
+              linhas={linhas}
+              vinculosLinhas={vinculosLinhas}
+              colaboradores={colaboradores}
+              onAtualizar={carregarDados}
+            />
+          </TabsContent>
+
+          {/* 6b. ABA: CADASTROS */}
+          <TabsContent value="cadastros" className="space-y-6 focus-visible:outline-none">
+            <AreaCadastros colaboradores={colaboradores} onAtualizar={carregarDados} />
           </TabsContent>
 
           {/* 6. ABA: PESSOAS JURÍDICAS */}
