@@ -2,6 +2,10 @@
 
 export type TipoDispositivo = 'celular' | 'notebook' | 'tablet' | 'outro'
 
+// ---- Contas de usuário (login / permissões) ----
+
+export type NivelAcesso = 'master' | 'admin'
+
 // "disponivel" substitui o antigo "backup / reserva"
 export type StatusDispositivo = 'em_uso' | 'disponivel' | 'manutencao'
 
@@ -216,6 +220,7 @@ export interface Contrato {
   vinculo?: string
   numero_vias?: number
   observacoes?: string
+  anexo_assinado?: string[]
   is_demo?: boolean
   created?: string
   updated?: string
@@ -224,6 +229,74 @@ export interface Contrato {
     colaborador?: Colaborador
     vinculo?: Vinculo
   }
+}
+
+// ---- Tipos de dispositivos (cadastro dinâmico) ----
+
+export interface TipoDispositivoConfig {
+  id: string
+  nome: string
+  usa_imei: boolean
+  created?: string
+}
+
+// ---- Linhas telefônicas ----
+
+export type TipoLinha = 'celular' | 'modem'
+
+export type StatusLinha = 'disponivel' | 'em_uso' | 'cancelada'
+
+export interface LinhaTelefonica {
+  id: string
+  numero: string
+  operadora?: string
+  plano?: string
+  tipo?: TipoLinha
+  imei?: string
+  colaborador?: string
+  status?: StatusLinha
+  observacoes?: string
+  is_demo?: boolean
+  created?: string
+  updated?: string
+  expand?: {
+    colaborador?: Colaborador
+  }
+}
+
+export interface NovaLinhaInput {
+  numero: string
+  operadora?: string
+  plano?: string
+  tipo?: TipoLinha
+  imei?: string
+  colaborador?: string
+  status?: StatusLinha
+  observacoes?: string
+}
+
+export interface VinculoLinha {
+  id: string
+  colaborador: string
+  linha: string
+  data_inicio: string
+  data_fim?: string
+  situacao: SituacaoVinculo
+  motivo_encerramento?: string
+  observacoes?: string
+  created?: string
+  updated?: string
+  expand?: {
+    colaborador?: Colaborador
+    linha?: LinhaTelefonica
+  }
+}
+
+export interface NovoVinculoLinhaInput {
+  colaborador: string
+  linha: string
+  data_inicio?: string
+  observacoes?: string
 }
 
 export interface AlertaDispositivo {

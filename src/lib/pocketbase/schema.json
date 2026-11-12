@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-08T23:01:21.770Z",
+  "generatedAt": "2026-11-12T18:55:57.941Z",
   "collections": [
     {
       "name": "users",
@@ -7,9 +7,9 @@
       "apiRules": {
         "list": "id = @request.auth.id",
         "view": "id = @request.auth.id",
-        "create": "",
-        "update": "id = @request.auth.id",
-        "delete": "id = @request.auth.id"
+        "create": "@request.auth.nivel = \"master\"",
+        "update": "@request.auth.nivel = \"master\" || (id = @request.auth.id && @request.body.nivel:isset = false && @request.body.verified:isset = false)",
+        "delete": "@request.auth.nivel = \"master\" && id != @request.auth.id"
       },
       "fields": [
         {
@@ -29,14 +29,29 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        },
+        {
+          "name": "nivel",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "master",
+            "admin"
+          ]
         }
       ],
       "indexes": [
@@ -108,14 +123,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "nacionalidade",
@@ -170,10 +190,15 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["ativo", "desligado"]
+          "selectValues": [
+            "ativo",
+            "desligado"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_colaboradores_nome ON colaboradores (nome)"]
+      "indexes": [
+        "CREATE INDEX idx_colaboradores_nome ON colaboradores (nome)"
+      ]
     },
     {
       "name": "dispositivos",
@@ -191,7 +216,12 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["celular", "notebook", "tablet", "outro"]
+          "selectValues": [
+            "celular",
+            "notebook",
+            "tablet",
+            "outro"
+          ]
         },
         {
           "name": "fabricante",
@@ -235,7 +265,11 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["em_uso", "disponivel", "manutencao"]
+          "selectValues": [
+            "em_uso",
+            "disponivel",
+            "manutencao"
+          ]
         },
         {
           "name": "data_aquisicao",
@@ -266,14 +300,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "ram",
@@ -394,14 +433,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": []
@@ -448,7 +492,10 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["ativo", "encerrado"]
+          "selectValues": [
+            "ativo",
+            "encerrado"
+          ]
         },
         {
           "name": "motivo_encerramento",
@@ -473,14 +520,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -529,7 +581,10 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["em_manutencao", "retornado"]
+          "selectValues": [
+            "em_manutencao",
+            "retornado"
+          ]
         },
         {
           "name": "observacoes",
@@ -548,17 +603,24 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_manutencoes_dispositivo ON manutencoes (dispositivo)"]
+      "indexes": [
+        "CREATE INDEX idx_manutencoes_dispositivo ON manutencoes (dispositivo)"
+      ]
     },
     {
       "name": "historico_movimentacoes",
@@ -622,14 +684,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -644,7 +711,7 @@
         "list": "",
         "view": "",
         "create": "",
-        "update": "",
+        "update": "@request.auth.id != \"\"",
         "delete": ""
       },
       "fields": [
@@ -653,7 +720,10 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["comodato", "distrato"]
+          "selectValues": [
+            "comodato",
+            "distrato"
+          ]
         },
         {
           "name": "dispositivo",
@@ -699,17 +769,82 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        },
+        {
+          "name": "anexo_assinado",
+          "type": "file",
+          "required": false,
+          "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_contratos_dispositivo ON contratos (dispositivo)"]
+      "indexes": [
+        "CREATE INDEX idx_contratos_dispositivo ON contratos (dispositivo)"
+      ]
+    },
+    {
+      "name": "logs_acesso",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "tipos_dispositivo",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "linhas_telefonicas",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [],
+      "indexes": []
+    },
+    {
+      "name": "vinculos_linhas",
+      "type": "base",
+      "apiRules": {
+        "list": null,
+        "view": null,
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": null
+      },
+      "fields": [],
+      "indexes": []
     }
   ]
 }
