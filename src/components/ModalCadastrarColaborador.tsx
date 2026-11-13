@@ -43,6 +43,7 @@ const VAZIO: NovoColaboradorInput = {
   cpf: '',
   endereco: '',
   cidade: '',
+  uf: '',
   departamento: '',
   cargo: '',
   email: '',
@@ -55,7 +56,7 @@ const VAZIO: NovoColaboradorInput = {
 /** Dialog de cadastro/edição de Colaborador. Na listagem (aba Colaboradores)
  *  é reutilizado em modo edição com os campos pré-preenchidos. O CPF tem
  *  máscara de digitação e validação do dígito verificador (Receita Federal).
- *  O campo Estado/UF foi removido a pedido do usuário (cidade permanece). */
+ * O campo Estado foi removido; o campo UF tem 2 caracteres. */
 export function ModalCadastrarColaborador({
   onColaboradorSalvo,
   triggerButton,
@@ -82,6 +83,7 @@ export function ModalCadastrarColaborador({
         cpf: colaboradorEmEdicao.cpf ? mascararCPF(colaboradorEmEdicao.cpf) : '',
         endereco: colaboradorEmEdicao.endereco || '',
         cidade: colaboradorEmEdicao.cidade || '',
+        uf: colaboradorEmEdicao.uf || '',
         departamento: colaboradorEmEdicao.departamento || '',
         cargo: colaboradorEmEdicao.cargo || '',
         email: colaboradorEmEdicao.email || '',
@@ -222,6 +224,16 @@ export function ModalCadastrarColaborador({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="sm:col-span-2">{campo('Endereço completo', 'endereco')}</div>
             {campo('Cidade', 'cidade')}
+            <div className="space-y-1">
+              <Label className="text-xs text-emerald-800">UF</Label>
+              <Input
+                value={formulario.uf || ''}
+                onChange={(e) => set('uf', e.target.value.toUpperCase().slice(0, 2))}
+                maxLength={2}
+                placeholder="SP"
+                className="rounded-xl border-emerald-200 text-sm"
+              />
+            </div>
           </div>
         </section>
 

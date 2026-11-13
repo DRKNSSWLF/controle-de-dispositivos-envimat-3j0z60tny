@@ -65,12 +65,17 @@ async function carregarLogo(): Promise<LogoEmbutido | null> {
       img.src = LOGO_URL
     })
     if (!dataUrl) return null
-    // Assinatura completa do logo: proporção real do arquivo, com pequena folga
-    const proporcao = proporcaoReal > 0 ? proporcaoReal * 1.02 : 0.22
-    // Cabeçalho: logo centralizado, com ~8 mm de altura e sempre acima da
-    // linha de separação (desenhada em y + 11 do cabeçalho)
-    const altura = 8
-    const largura = Math.min(40, altura / proporcao)
+    // Proporção real do arquivo (fallback se a imagem não tiver dimensões)
+    const proporcao = proporcaoReal > 0 ? proporcaoReal : 0.22
+    // Cabeçalho: largura de 40 mm com altura proporcional (proporção real do arquivo).
+    // Se a altura passar de 13 mm, reduz a largura mantendo a proporção, para o logo
+    // caber acima da linha de separação.
+    let largura = 40
+    let altura = largura * proporcao
+    if (altura > 13) {
+      altura = 13
+      largura = altura / proporcao
+    }
     logoCache = { dataUrl, largura, altura }
     return logoCache
   } catch {
@@ -142,23 +147,6 @@ function qualificacaoColaborador(c: Colaborador): string {
     .join(' ')
 }
 
-// Descrição corrida do objeto (mesmo estilo do contrato real; celular com IMEI 1 E 2)
-function descricaoInline(d: Dispositivo): string {
-  const marca = d.fabricante || '—'
-  const modelo = d.modelo || '—'
-  const serie = d.numero_serie || '—'
-  if (d.tipo === 'celular') {
-    return `Smartphone, marca ${marca}, modelo ${modelo}, IMEI 1: ${d.imei1 || '—'}, IMEI 2: ${d.imei2 || '—'}, nº Série ${serie}.`
-  }
-  if (d.tipo === 'tablet') {
-    return `Tablet, marca ${marca}, modelo ${modelo}, nº Série ${serie}.`
-  }
-  if (d.tipo === 'notebook') {
-    return `Notebook, marca ${marca}, modelo ${modelo}, nº Série ${serie}.`
-  }
-  return `Equipamento eletrônico, marca ${marca}, modelo ${modelo}, nº Série ${serie}.`
-}
-
 function tituloDocumento(tipo: 'comodato' | 'distrato', d: Dispositivo): string {
   const sufixo =
     d.tipo === 'celular'
@@ -173,31 +161,35 @@ function tituloDocumento(tipo: 'comodato' | 'distrato', d: Dispositivo): string 
     : `CONTRATO DE COMODATO DE ${sufixo}`
 }
 
-// Cláusulas do contrato real (modelo de comodato de celular da ENVIMAT).
-// Para notebooks/tablets o texto é o mesmo, variando apenas o bloco do
-// dispositivo; a cláusula de contas telefônicas só existe no comodato de celular.
-function clausulasComodato(d: Dispositivo): string[] {
-  const aparelho = d.tipo === 'celular' ? 'telefone celular' : 'equipamento'
-  const clausulas: string[] = []
-  if (d.tipo === 'celular') {
-    clausulas.push(
-      'Cláusula 2ª. O COMODANTE é responsável pelo pagamento de todas as contas telefônicas compreendidas no período de vigência deste contrato.',
-    )
-  }
-  clausulas.push(
-    `Cláusula ${d.tipo === 'celular' ? '3ª' : '2ª'}. É proibido ao COMODATÁRIO emprestar o ${aparelho}, objeto deste contrato, a terceiros.`,
-    `Cláusula ${d.tipo === 'celular' ? '4ª' : '3ª'}. O COMODATÁRIO deverá comunicar imediatamente à COMODANTE os defeitos que surgirem no ${aparelho} e providenciar o conserto do mesmo.`,
-    `Cláusula ${d.tipo === 'celular' ? '5ª' : '4ª'}. Em caso de roubo ou furto, o COMODATÁRIO deverá apresentar boletim de ocorrência.`,
-    `Cláusula ${d.tipo === 'celular' ? '6ª' : '5ª'}. O COMODATÁRIO deverá devolver o ${aparelho} à COMODANTE quando for por esta solicitado, nas mesmas condições em que estava quando o recebeu, ou seja, em perfeitas condições de uso, respondendo pelos danos ou prejuízos causados.`,
-    `Cláusula ${d.tipo === 'celular' ? '7ª' : '6ª'}. A devolução deve se dar no mesmo prazo da contratação dos serviços do COMODATÁRIO, ao término deste, efetuar a devolução do ${aparelho} imediatamente à COMODANTE.`,
-    'Cláusula 8ª. É assegurado às partes a rescisão do presente contrato a qualquer momento, devendo, entretanto, comunicar à outra parte com antecedência mínima de 5 dias.',
-    'Cláusula 9ª. O descumprimento, pelos contratantes, do disposto nas presentes cláusulas também ensejará a rescisão deste instrumento.',
-    'Cláusula 10ª. Este contrato é de prazo indeterminado.',
-    'Cláusula 11ª. Este contrato deve ser registrado no Cartório de Registro de Títulos e Documentos.',
-    'Cláusula 12ª. O presente instrumento passa a valer a partir da assinatura pelas partes.',
-    'Cláusula 13ª. Para dirimir quaisquer controvérsias oriundas do CONTRATO, as partes elegem o foro da comarca de São Paulo.',
-  )
-  return clausulas
+// Texto oficial dos tópicos DAS OBRIGAÇÕES DO COMODATÁRIO, DA DEVOLUÇÃO e DA
+// RESCISÃO (igual para celular, tablet e notebook). A Cláusula 1ª fica no tópico DO OBJETO.
+const CLAUSULAS_OBRIGACOES = [
+  'Cláusula 2ª. É proibido ao COMODATARIO emprestar o equipamento objeto deste contrato, a terceiros.',
+  'Cláusula 3ª. O COMODATÁRIO deverá comunicar imediatamente à COMODANTE os defeitos que surgirem no equipamento para que à COMODANTE providencie o conserto do mesmo.',
+  'Cláusula 4ª. Em caso de roubo ou furto, o COMODATÁRIO deverá apresentar boletim de ocorrência.',
+]
+
+const CLAUSULAS_DEVOLUCAO = [
+  'Cláusula 5ª. O COMODATÁRIO deverá devolver o equipamento à COMODANTE quando for por esta solicitado, nas mesmas condições em que estava quando o recebeu, ou seja, em perfeitas condições de uso, respondendo pelos danos ou prejuízos causados.',
+  'Cláusula 6ª. A devolução deve se dar no mesmo prazo da contratação dos serviços do COMODATÁRIO, ao término deste, efetuar a devolução do equipamento imediatamente ao COMODANTE.',
+]
+
+const CLAUSULAS_RESCISAO = [
+  'Cláusula 7ª. É assegurado às partes a rescisão do presente contrato a qualquer momento, devendo, entretanto, comunicar à outra parte com antecedência mínima de 05 dias.',
+  'Cláusula 8ª. O descumprimento, pelos contratantes, do disposto nas presentes cláusulas também ensejará a rescisão deste instrumento.',
+]
+
+// Cláusulas finais do comodato, numeradas a partir da 9ª (a de contas telefônicas só existe no celular)
+function clausulasComodatoFinais(d: Dispositivo): string[] {
+  const textos = [
+    'O COMODANTE é responsável pelo pagamento de todas as contas telefônicas compreendidas no período de vigência deste contrato.',
+    'Este contrato é de prazo indeterminado.',
+    'Este contrato deve ser registrado no Cartório de Registro de Títulos e Documentos.',
+    'O presente instrumento passa a valer a partir da assinatura pelas partes.',
+    'Para dirimir quaisquer controvérsias oriundas do CONTRATO, as partes elegem o foro da comarca de São Paulo.',
+  ]
+  const itens = d.tipo === 'celular' ? textos : textos.slice(1)
+  return itens.map((t, i) => `Cláusula ${9 + i}ª. ${t}`)
 }
 
 function clausulasDistrato(contrato: Contrato): string[] {
@@ -253,14 +245,14 @@ function rodape(doc: jsPDF) {
 function cabecalho(doc: jsPDF, y: number, logo: LogoEmbutido | null): number {
   const margem = 14
   if (logo) {
-    // Logo oficial completo (assinatura ENVIMAT): centrado no topo, terminando
-    // acima da linha de separação (y + 11) com folga
+    // Logo oficial completo: centralizado na folha, com a base 2 mm acima da
+    // linha de separação (y + 11), sempre totalmente acima dela
     const larguraPagina = doc.internal.pageSize.getWidth()
     doc.addImage(
       logo.dataUrl,
       'PNG',
       (larguraPagina - logo.largura) / 2,
-      y - 3,
+      y + 9 - logo.altura,
       logo.largura,
       logo.altura,
     )
@@ -309,19 +301,25 @@ function paragrafo(doc: jsPDF, ctx: CtxVia, y: number, texto: string, negrito = 
   return y + 1
 }
 
+// Título de tópico (ex.: DO OBJETO, DAS OBRIGAÇÕES) com espaço em branco antes dele
+function topico(doc: jsPDF, ctx: CtxVia, y: number, texto: string): number {
+  // Espaço em branco extra entre os tópicos para leitura clara
+  return paragrafo(doc, ctx, y + 6, texto, true)
+}
+
+// Bloco CONFIGURAÇÃO DO DISPOSITIVO: negrito e fonte menor (faz parte do tópico DO OBJETO)
 function blocoConfiguracao(doc: jsPDF, ctx: CtxVia, y: number): number {
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(8.5)
+  doc.setFontSize(6.2)
   y = garanteEspaco(doc, y, 6, ctx.logo)
   doc.text('CONFIGURAÇÃO DO DISPOSITIVO', 14, y)
-  y += 4.5
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(8)
+  y += 3.6
+  doc.setFontSize(6)
   for (const campo of camposDoDispositivo(ctx.dispositivo)) {
     y = garanteEspaco(doc, y, 4, ctx.logo)
     doc.text(`${campo.rotulo}:`, 16, y)
     doc.text(campo.valor, 52, y)
-    y += 3.6
+    y += 3
   }
   return y + 2
 }
@@ -330,7 +328,7 @@ function blocoAssinaturas(doc: jsPDF, ctx: CtxVia, y: number): number {
   const margem = 14
   const largura = larguraUtil(doc)
 
-  y = garanteEspaco(doc, y, 34, ctx.logo)
+  y = garanteEspaco(doc, y, 52, ctx.logo)
   y += 2
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8.2)
@@ -360,16 +358,20 @@ function blocoAssinaturas(doc: jsPDF, ctx: CtxVia, y: number): number {
   doc.text(ctx.colaborador.nome || 'COMODATÁRIO', col2, y + 6, { align: 'center' })
   doc.text('COMODATÁRIO', col2, y + 8.8, { align: 'center' })
 
-  doc.line(col3 - 20, y, col3 + 20, y)
+  // Testemunhas: bloco descido 16 mm, com a legenda CPF: abaixo de cada linha de assinatura
+  const t = 16
+  doc.line(col3 - 20, y + t, col3 + 20, y + t)
   doc.setFont('helvetica', 'bold')
-  doc.text('TESTEMUNHAS:', col3, y + 3.2, { align: 'center' })
+  doc.text('TESTEMUNHAS:', col3, y + t + 3.2, { align: 'center' })
   doc.setFont('helvetica', 'normal')
-  doc.text('1. ______________________', col3, y + 8.8, { align: 'center' })
-  doc.text('2. ______________________', col3, y + 13.5, { align: 'center' })
+  doc.text('1. ______________________', col3, y + t + 8.8, { align: 'center' })
+  doc.text('CPF:', col3, y + t + 11.4, { align: 'center' })
+  doc.text('2. ______________________', col3, y + t + 17.4, { align: 'center' })
+  doc.text('CPF:', col3, y + t + 20, { align: 'center' })
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8.2)
 
-  return y + 18
+  return y + t + 23
 }
 
 function renderVia(doc: jsPDF, ctx: CtxVia, via: number, totalVias: number): number {
@@ -421,27 +423,32 @@ function renderVia(doc: jsPDF, ctx: CtxVia, via: number, totalVias: number): num
   }
 
   // DO OBJETO
-  y = paragrafo(doc, ctx, y, ehDistrato ? 'DO OBJETO DO DISTRATO' : 'DO OBJETO DO CONTRATO', true)
+  y = topico(doc, ctx, y, ehDistrato ? 'DO OBJETO DO DISTRATO' : 'DO OBJETO DO CONTRATO')
   y = paragrafo(
     doc,
     ctx,
     y,
     'Cláusula 1ª. O presente contrato tem como OBJETO o comodato do equipamento descrito a seguir:',
   )
-  y = paragrafo(doc, ctx, y, descricaoInline(dispositivo))
   y = blocoConfiguracao(doc, ctx, y)
 
   // Cláusulas
   if (!ehDistrato) {
-    y = paragrafo(doc, ctx, y, 'DAS OBRIGAÇÕES DO COMODATÁRIO', true)
-    for (const cl of clausulasComodato(dispositivo)) y = paragrafo(doc, ctx, y, cl)
+    y = topico(doc, ctx, y, 'DAS OBRIGAÇÕES DO COMODATÁRIO')
+    for (const cl of CLAUSULAS_OBRIGACOES) y = paragrafo(doc, ctx, y, cl)
+    y = topico(doc, ctx, y, 'DA DEVOLUÇÃO')
+    for (const cl of CLAUSULAS_DEVOLUCAO) y = paragrafo(doc, ctx, y, cl)
+    y = topico(doc, ctx, y, 'DA RESCISÃO')
+    for (const cl of [...CLAUSULAS_RESCISAO, ...clausulasComodatoFinais(dispositivo)]) {
+      y = paragrafo(doc, ctx, y, cl)
+    }
   } else {
     for (const cl of clausulasDistrato(contrato)) y = paragrafo(doc, ctx, y, cl)
   }
 
   // DO FORO + fechamento
   if (!ehDistrato) {
-    y = paragrafo(doc, ctx, y, 'DO FORO', true)
+    y = topico(doc, ctx, y, 'DO FORO')
   }
   y = paragrafo(
     doc,

@@ -39,6 +39,7 @@ const VAZIO: NovaPessoaJuridicaInput = {
   cpf_representante: '',
   endereco: '',
   cidade: '',
+  uf: '',
   telefone: '',
   email: '',
   observacoes: '',
@@ -48,7 +49,7 @@ const VAZIO: NovaPessoaJuridicaInput = {
  *  Jurídicas) é reutilizado em modo edição com os campos pré-preenchidos.
  *  CNPJ e CPF do representante têm máscara de digitação e validação do
  *  dígito verificador (Receita Federal) — cadastro inválido é bloqueado.
- *  O campo Estado/UF foi removido a pedido do usuário (cidade permanece). */
+ * O campo Estado foi removido; o campo UF tem 2 caracteres. */
 export function ModalCadastrarPessoaJuridica({
   onSalvo,
   triggerButton,
@@ -75,6 +76,7 @@ export function ModalCadastrarPessoaJuridica({
           : '',
         endereco: pessoaEmEdicao.endereco || '',
         cidade: pessoaEmEdicao.cidade || '',
+        uf: pessoaEmEdicao.uf || '',
         telefone: pessoaEmEdicao.telefone || '',
         email: pessoaEmEdicao.email || '',
         observacoes: pessoaEmEdicao.observacoes || '',
@@ -214,6 +216,16 @@ export function ModalCadastrarPessoaJuridica({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="sm:col-span-2">{campo('Endereço', 'endereco')}</div>
             {campo('Cidade', 'cidade')}
+            <div className="space-y-1">
+              <Label className="text-xs text-emerald-800">UF</Label>
+              <Input
+                value={formulario.uf || ''}
+                onChange={(e) => set('uf', e.target.value.toUpperCase().slice(0, 2))}
+                maxLength={2}
+                placeholder="SP"
+                className="rounded-xl border-emerald-200 text-sm"
+              />
+            </div>
             {campo('Telefone', 'telefone')}
             {campo('E-mail', 'email', 'contato@empresa.com')}
           </div>
