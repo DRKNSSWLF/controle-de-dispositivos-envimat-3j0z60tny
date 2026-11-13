@@ -44,9 +44,7 @@ export function PainelAlertas({ alertas, onIrParaInventario }: PainelAlertasProp
             <span className="text-xs font-semibold text-rose-800 uppercase tracking-wider">
               Avisos Críticos
             </span>
-            <h3 className="text-2xl font-bold text-rose-950 font-serif italic mt-0.5">
-              {criticos.length}
-            </h3>
+            <h3 className="text-2xl font-bold text-rose-800 font-sans mt-0.5">{criticos.length}</h3>
             <p className="text-xs text-rose-800/80 mt-1">
               Dispositivos sem comodato ou manutenção estourada
             </p>
@@ -61,7 +59,7 @@ export function PainelAlertas({ alertas, onIrParaInventario }: PainelAlertasProp
             <span className="text-xs font-semibold text-amber-800 uppercase tracking-wider">
               Pontos de Atenção
             </span>
-            <h3 className="text-2xl font-bold text-amber-950 font-serif italic mt-0.5">
+            <h3 className="text-2xl font-bold text-amber-800 font-sans mt-0.5">
               {atencoes.length}
             </h3>
             <p className="text-xs text-amber-800/80 mt-1">
@@ -78,7 +76,7 @@ export function PainelAlertas({ alertas, onIrParaInventario }: PainelAlertasProp
             <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">
               Total de Alertas
             </span>
-            <h3 className="text-2xl font-bold text-emerald-950 font-serif italic mt-0.5">
+            <h3 className="text-2xl font-bold text-emerald-950 font-sans mt-0.5">
               {alertas.length}
             </h3>
             <p className="text-xs text-emerald-800/80 mt-1">
@@ -94,7 +92,7 @@ export function PainelAlertas({ alertas, onIrParaInventario }: PainelAlertasProp
       {/* Lista de Alertas Ativos */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-serif italic font-normal text-emerald-950">
+          <h3 className="text-lg font-sans font-semibold text-emerald-950">
             Alertas Automáticos do Parque Tecnológico
           </h3>
           {onIrParaInventario && (

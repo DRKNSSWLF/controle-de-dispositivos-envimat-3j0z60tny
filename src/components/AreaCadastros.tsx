@@ -20,7 +20,7 @@ export function AreaCadastros({ colaboradores, onAtualizar }: AreaCadastrosProps
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-3xl border border-emerald-100 p-5 sm:p-6 shadow-sm">
-        <h3 className="font-serif italic text-xl font-normal text-emerald-950">Cadastros</h3>
+        <h3 className="font-sans font-semibold text-xl text-emerald-950">Cadastros</h3>
         <p className="text-xs text-emerald-700/80 mt-1">
           Central única de inclusões no inventário. Nada é excluído — registros apenas mudam de
           status e o histórico fica preservado.

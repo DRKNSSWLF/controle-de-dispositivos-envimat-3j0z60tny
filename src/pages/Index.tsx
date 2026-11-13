@@ -46,10 +46,9 @@ import {
   UploadCloud,
   BellRing,
   RotateCw,
-  Leaf,
   Layers,
-  MapPin,
   Building2,
+  UserRound,
   Link2,
   FileText,
   Wrench,
@@ -171,30 +170,25 @@ export default function Index() {
   const atualizarTudo = carregarDados
 
   return (
-    <div className="min-h-screen bg-[#fafcf9] text-emerald-950 pb-16 font-sans">
-      {/* Topo / Header com Identidade ENVIMAT (Meio ambiente, São Carlos - SP, tecnologia sustentável) */}
-      <header className="border-b border-emerald-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-[0_1px_6px_rgba(20,50,30,0.03)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-sm">
-              <Leaf className="w-5 h-5 text-emerald-200" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold tracking-wider text-xs uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 font-mono">
-                  ENVIMAT
-                </span>
-                <span className="text-xs text-emerald-800/60 hidden sm:inline-flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> São Carlos - SP
-                </span>
-              </div>
-              <h1 className="font-serif italic text-xl font-normal text-emerald-950 leading-tight">
-                Controle de Dispositivos e Comodato
-              </h1>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#F2F2F2] text-envimat-verde-escuro pb-16 font-sans">
+      {/* Topo / Header — identidade ENVIMAT (manual da marca 2026) */}
+      <header className="border-b border-emerald-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-[0_1px_6px_rgba(10,68,33,0.05)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+          {/* Logo oficial ENVIMAT (assinatura completa, arquivo do manual) */}
+          <img
+            src="/envimat-logo.svg"
+            alt="ENVIMAT — Environment & Material Handling"
+            className="h-9 sm:h-10 w-auto shrink-0"
+          />
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          {/* Título centralizado da ferramenta */}
+          <h1 className="flex-1 text-center text-base sm:text-lg font-semibold tracking-tight text-envimat-verde-escuro leading-tight">
+            <span className="hidden md:inline">Controle de Dispositivos e Comodato</span>
+            <span className="md:hidden">Controle de Dispositivos</span>
+          </h1>
+
+          {/* Ações e usuário logado */}
+          <div className="flex items-center gap-2 ml-auto">
             <Button
               variant="outline"
               size="sm"
@@ -209,10 +203,11 @@ export default function Index() {
 
             <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-emerald-200">
               <div className="text-right hidden md:block">
-                <p className="text-xs font-semibold text-emerald-950 leading-tight">
+                <p className="text-xs font-semibold text-envimat-verde-escuro leading-tight flex items-center gap-1.5">
+                  <UserRound className="w-3.5 h-3.5 text-envimat-verde" />
                   {usuario?.nome}
                 </p>
-                <p className="text-[10px] uppercase tracking-wide text-emerald-700/70">
+                <p className="text-[10px] uppercase tracking-wide text-envimat-cinza">
                   {usuario?.nivel === 'master' ? 'Master' : 'Administrativo'}
                 </p>
               </div>
@@ -236,7 +231,7 @@ export default function Index() {
         <Tabs value={abaAtiva} onValueChange={setAbaAtiva} className="space-y-6">
           {/* Barra de Abas */}
           <div className="flex overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            <TabsList className="bg-emerald-100/40 p-1 rounded-2xl border border-emerald-200/50 inline-flex">
+            <TabsList className="bg-[#E9F0EA] p-1 rounded-2xl border border-[#c6c6c6]/40 inline-flex">
               <TabsTrigger
                 value="geral"
                 className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-950 data-[state=active]:shadow-sm px-4 py-2 text-xs font-medium text-emerald-900 transition-all flex items-center gap-2"
@@ -395,7 +390,7 @@ export default function Index() {
               <div className="bg-white rounded-3xl border border-emerald-100 p-5 sm:p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-serif italic text-xl font-normal text-emerald-950">
+                    <h3 className="font-sans font-semibold text-xl text-emerald-950">
                       Indicadores Fora do Esperado
                     </h3>
                     <p className="text-xs text-emerald-700/80">

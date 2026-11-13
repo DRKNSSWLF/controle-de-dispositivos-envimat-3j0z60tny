@@ -158,7 +158,7 @@ export function ModalCadastrarColaborador({
   const corpo = (
     <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border-emerald-100">
       <DialogHeader>
-        <DialogTitle className="font-serif italic text-xl text-emerald-950">
+        <DialogTitle className="font-sans font-semibold text-xl text-emerald-950">
           {editando ? 'Editar Colaborador' : 'Cadastrar Colaborador'}
         </DialogTitle>
         <DialogDescription className="text-xs text-emerald-700">

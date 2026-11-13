@@ -176,7 +176,7 @@ export function ImportarColaboradores({ onImportadoSucesso }: ImportarColaborado
       <CardHeader className="pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <CardTitle className="font-serif italic text-2xl text-emerald-950 font-normal">
+            <CardTitle className="font-sans font-semibold text-2xl text-emerald-950">
               Importação de Planilha de Colaboradores
             </CardTitle>
             <CardDescription className="text-emerald-800/70">

@@ -71,7 +71,7 @@ export function VisaoGeralInventario({
               </span>
               <Smartphone className="w-4 h-4 text-emerald-700" />
             </div>
-            <div className="text-3xl font-serif italic text-emerald-950 font-normal">
+            <div className="text-3xl font-sans font-semibold text-emerald-950 tracking-tight">
               {stats.total}
             </div>
             <p className="text-[11px] text-emerald-700/80 mt-1">Inventário geral ENVIMAT</p>
@@ -88,7 +88,7 @@ export function VisaoGeralInventario({
               <span className="text-xs font-semibold uppercase tracking-wider">Em Uso</span>
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="text-3xl font-serif italic text-emerald-950 font-normal">
+            <div className="text-3xl font-sans font-semibold text-emerald-950 tracking-tight">
               {stats.emUso}
             </div>
             <p className="text-[11px] text-emerald-700/80 mt-1">Com colaboradores em campo</p>
@@ -105,7 +105,7 @@ export function VisaoGeralInventario({
               <span className="text-xs font-semibold uppercase tracking-wider">Disponível</span>
               <Archive className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="text-3xl font-serif italic text-emerald-950 font-normal">
+            <div className="text-3xl font-sans font-semibold text-emerald-950 tracking-tight">
               {stats.disponivel}
             </div>
             <p className="text-[11px] text-emerald-700/80 mt-1">Prontos para substituição</p>
@@ -122,7 +122,7 @@ export function VisaoGeralInventario({
               <span className="text-xs font-semibold uppercase tracking-wider">Em Manutenção</span>
               <AlertOctagon className="w-4 h-4 text-amber-600" />
             </div>
-            <div className="text-3xl font-serif italic text-amber-950 font-normal">
+            <div className="text-3xl font-sans font-semibold text-amber-800 tracking-tight">
               {stats.manutencao}
             </div>
             <p className="text-[11px] text-amber-800/80 mt-1">
@@ -140,7 +140,7 @@ export function VisaoGeralInventario({
               <span className="text-xs font-semibold uppercase tracking-wider">Idade Média</span>
               <Calendar className="w-4 h-4 text-emerald-700" />
             </div>
-            <div className="text-3xl font-serif italic text-emerald-950 font-normal">
+            <div className="text-3xl font-sans font-semibold text-emerald-950 tracking-tight">
               {stats.idadeMediaAnos}{' '}
               <span className="text-sm font-sans font-normal text-emerald-700">anos</span>
             </div>
@@ -171,7 +171,7 @@ export function VisaoGeralInventario({
             </div>
             <div>
               <p className="text-xs text-emerald-700">Celulares</p>
-              <p className="text-lg font-bold text-emerald-950 font-serif italic">
+              <p className="text-lg font-bold text-emerald-950 font-sans">
                 {stats.porTipo.celular}
               </p>
             </div>
@@ -187,7 +187,7 @@ export function VisaoGeralInventario({
             </div>
             <div>
               <p className="text-xs text-emerald-700">Notebooks</p>
-              <p className="text-lg font-bold text-emerald-950 font-serif italic">
+              <p className="text-lg font-bold text-emerald-950 font-sans">
                 {stats.porTipo.notebook}
               </p>
             </div>
@@ -203,9 +203,7 @@ export function VisaoGeralInventario({
             </div>
             <div>
               <p className="text-xs text-emerald-700">Tablets / Rugged</p>
-              <p className="text-lg font-bold text-emerald-950 font-serif italic">
-                {stats.porTipo.tablet}
-              </p>
+              <p className="text-lg font-bold text-emerald-950 font-sans">{stats.porTipo.tablet}</p>
             </div>
           </button>
 
@@ -219,9 +217,7 @@ export function VisaoGeralInventario({
             </div>
             <div>
               <p className="text-xs text-emerald-700">Coletores / Outros</p>
-              <p className="text-lg font-bold text-emerald-950 font-serif italic">
-                {stats.porTipo.outro}
-              </p>
+              <p className="text-lg font-bold text-emerald-950 font-sans">{stats.porTipo.outro}</p>
             </div>
           </button>
         </div>

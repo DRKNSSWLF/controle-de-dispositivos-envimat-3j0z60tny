@@ -188,7 +188,7 @@ export function SecaoUsuarios() {
       <Card className="border-emerald-100 bg-white shadow-sm rounded-2xl">
         <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div>
-            <h3 className="font-serif italic text-lg text-emerald-950">
+            <h3 className="font-sans font-semibold text-lg text-emerald-950">
               Controle de acesso à ferramenta
             </h3>
             <p className="text-xs text-emerald-700/80 mt-0.5">
@@ -216,7 +216,7 @@ export function SecaoUsuarios() {
               </DialogTrigger>
               <DialogContent className="rounded-2xl border-emerald-100 sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle className="font-serif italic text-xl text-emerald-950">
+                  <DialogTitle className="font-sans font-semibold text-xl text-emerald-950">
                     Incluir pessoa com acesso
                   </DialogTitle>
                   <DialogDescription className="text-xs text-emerald-700/80">
@@ -386,7 +386,7 @@ export function SecaoUsuarios() {
       >
         <DialogContent className="rounded-2xl border-emerald-100 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-serif italic text-xl text-emerald-950">
+            <DialogTitle className="font-sans font-semibold text-xl text-emerald-950">
               {alvoSenha?.id === usuarioLogado?.id ? 'Trocar minha senha' : 'Redefinir senha'}
             </DialogTitle>
             <DialogDescription className="text-xs text-emerald-700/80">

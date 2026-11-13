@@ -141,7 +141,7 @@ export function ModalLinhaTelefonica({
       <DialogTrigger asChild>{triggerButton || <span />}</DialogTrigger>
       <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto rounded-3xl border-emerald-100">
         <DialogHeader>
-          <DialogTitle className="font-serif italic text-xl text-emerald-950 flex items-center gap-2">
+          <DialogTitle className="font-sans font-semibold text-xl text-emerald-950 flex items-center gap-2">
             <Phone className="w-5 h-5 text-emerald-700" />
             {linhaEdicao ? 'Editar Linha Telefônica' : 'Nova Linha Telefônica'}
           </DialogTitle>

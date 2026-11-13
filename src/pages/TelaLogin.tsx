@@ -2,16 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Leaf,
-  Lock,
-  Mail,
-  ShieldCheck,
-  AlertCircle,
-  KeyRound,
-  ArrowLeft,
-  MailCheck,
-} from 'lucide-react'
+import { Lock, Mail, ShieldCheck, AlertCircle, KeyRound, ArrowLeft, MailCheck } from 'lucide-react'
 import { useAuth, DOMINIO_EMPRESA } from '@/lib/auth'
 import pb from '@/lib/pocketbase/client'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
@@ -72,17 +63,16 @@ export default function TelaLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fafcf9] via-emerald-50 to-emerald-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F2F2F2] p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white/90 backdrop-blur rounded-3xl border border-emerald-100 shadow-[0_8px_30px_rgba(20,50,30,0.08)] p-8">
+        <div className="bg-white/90 backdrop-blur rounded-3xl border border-emerald-100 shadow-[0_8px_30px_rgba(10,68,33,0.08)] p-8">
           <div className="flex flex-col items-center text-center gap-3 mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-sm">
-              <Leaf className="w-7 h-7 text-emerald-200" />
-            </div>
-            <span className="font-extrabold tracking-wider text-xs uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 font-mono">
-              ENVIMAT
-            </span>
-            <h1 className="font-serif italic text-2xl text-emerald-950 leading-tight">
+            <img
+              src="/envimat-logo.svg"
+              alt="ENVIMAT — Environment & Material Handling"
+              className="h-12 w-auto"
+            />
+            <h1 className="font-sans font-semibold text-2xl text-emerald-950 leading-tight tracking-tight">
               Controle de Dispositivos e Comodato
             </h1>
             <p className="text-xs text-emerald-700/80 flex items-center gap-1.5">
@@ -97,7 +87,9 @@ export default function TelaLogin() {
                 <MailCheck className="w-7 h-7 text-emerald-700" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="font-serif italic text-xl text-emerald-950">Verifique seu e-mail</h2>
+                <h2 className="font-sans font-semibold text-xl text-emerald-950">
+                  Verifique seu e-mail
+                </h2>
                 <p className="text-xs text-emerald-800/80 leading-relaxed">
                   Se existir uma conta para <strong>{email}</strong>, você receberá em instantes um
                   link para definir uma nova senha. O link vale por pouco tempo — se não chegar,
@@ -119,7 +111,7 @@ export default function TelaLogin() {
           ) : visao === 'esqueci' ? (
             <form onSubmit={pedirRedefinicao} className="space-y-4">
               <div className="space-y-1.5">
-                <h2 className="font-serif italic text-xl text-emerald-950 flex items-center gap-2">
+                <h2 className="font-sans font-semibold text-xl text-emerald-950 flex items-center gap-2">
                   <KeyRound className="w-5 h-5 text-emerald-700" />
                   Esqueci minha senha
                 </h2>

@@ -207,7 +207,7 @@ export function SecaoTiposDispositivo({ onAtualizado }: SecaoTiposDispositivoPro
         </DialogTrigger>
         <DialogContent className="max-w-md rounded-3xl border-emerald-100">
           <DialogHeader>
-            <DialogTitle className="font-serif italic text-xl text-emerald-950">
+            <DialogTitle className="font-sans font-semibold text-xl text-emerald-950">
               {editando ? 'Editar Tipo de Dispositivo' : 'Novo Tipo de Dispositivo'}
             </DialogTitle>
             <DialogDescription className="text-xs text-emerald-700">
@@ -257,7 +257,7 @@ export function SecaoTiposDispositivo({ onAtualizado }: SecaoTiposDispositivoPro
       <AlertDialog open={!!excluindo} onOpenChange={(v) => !v && setExcluindo(null)}>
         <AlertDialogContent className="rounded-3xl border-emerald-100">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-serif italic text-xl text-emerald-950">
+            <AlertDialogTitle className="font-sans font-semibold text-xl text-emerald-950">
               Excluir tipo “{excluindo?.nome}”?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-emerald-800">

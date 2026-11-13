@@ -52,7 +52,7 @@ export function SecaoLogs() {
         <CardContent className="p-4 sm:p-5 flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="font-serif italic text-lg text-emerald-950">Logs de Acesso</h3>
+              <h3 className="font-sans font-semibold text-lg text-emerald-950">Logs de Acesso</h3>
               <p className="text-xs text-emerald-700/80 mt-0.5">
                 Registro de cada tentativa de login: usuário, data/hora e resultado.
               </p>

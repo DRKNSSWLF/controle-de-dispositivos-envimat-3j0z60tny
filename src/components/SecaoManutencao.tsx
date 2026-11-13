@@ -264,7 +264,7 @@ export function SecaoManutencao({
       <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogContent className="max-w-md rounded-3xl border-emerald-100">
           <DialogHeader>
-            <DialogTitle className="font-serif italic text-xl text-emerald-950">
+            <DialogTitle className="font-sans font-semibold text-xl text-emerald-950">
               Enviar para Manutenção
             </DialogTitle>
             <DialogDescription className="text-xs text-emerald-700">
@@ -331,7 +331,7 @@ export function SecaoManutencao({
       <Dialog open={!!retornando} onOpenChange={(o) => !o && setRetornando(null)}>
         <DialogContent className="max-w-md rounded-3xl border-emerald-100">
           <DialogHeader>
-            <DialogTitle className="font-serif italic text-xl text-emerald-950">
+            <DialogTitle className="font-sans font-semibold text-xl text-emerald-950">
               Registrar Retorno da Manutenção
             </DialogTitle>
             <DialogDescription className="text-xs text-emerald-700">

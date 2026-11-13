@@ -134,7 +134,7 @@ export function ModalCadastrarDispositivo({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-emerald-100 p-6">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="pb-4">
-            <DialogTitle className="font-serif italic text-2xl text-emerald-950 font-normal">
+            <DialogTitle className="font-sans font-semibold text-2xl text-emerald-950">
               Novo Dispositivo Eletrônico
             </DialogTitle>
             <DialogDescription className="text-emerald-800/80">
