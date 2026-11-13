@@ -40,6 +40,7 @@ import { SecaoLogs } from '@/components/SecaoLogs'
 import { SecaoLinhas } from '@/components/SecaoLinhas'
 import { AreaCadastros } from '@/components/AreaCadastros'
 import { useAuth } from '@/lib/auth'
+import { BotaoAlternarTema } from '@/hooks/use-tema'
 import {
   Smartphone,
   Users,
@@ -170,13 +171,13 @@ export default function Index() {
   const atualizarTudo = carregarDados
 
   return (
-    <div className="min-h-screen bg-[#F2F2F2] text-envimat-verde-escuro pb-16 font-sans">
+    <div className="min-h-screen bg-[#F2F2F2] dark:bg-[#0b1a12] text-envimat-verde-escuro dark:text-emerald-dark-800 pb-16 font-sans">
       {/* Topo / Header — identidade ENVIMAT (manual da marca 2026) */}
-      <header className="border-b border-emerald-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-[0_1px_6px_rgba(10,68,33,0.05)]">
+      <header className="border-b border-emerald-100 dark:border-emerald-800/60 bg-white/80 dark:bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-[0_1px_6px_rgba(10,68,33,0.05)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           {/* Logo oficial ENVIMAT (assinatura completa, arquivo do manual) */}
           <img
-            src="/envimat-logo.svg"
+            src="/logo-envimat.png"
             alt="ENVIMAT — Environment & Material Handling"
             className="h-9 sm:h-10 w-auto shrink-0"
           />
@@ -189,6 +190,8 @@ export default function Index() {
 
           {/* Ações e usuário logado */}
           <div className="flex items-center gap-2 ml-auto">
+            <BotaoAlternarTema />
+
             <Button
               variant="outline"
               size="sm"

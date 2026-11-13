@@ -74,44 +74,45 @@
   }
 
   .dark {
-    /* Modo escuro consistente com a identidade ENVIMAT (uso raro na ferramenta) */
-    --background: 147 55% 8%;
-    --foreground: 0 0% 97%;
+    /* Modo escuro ENVIMAT: verde muito escuro de fundo, texto claro e contraste
+       adequado em tabelas, modais, badges e formulários */
+    --background: 150 40% 7%;
+    --foreground: 150 30% 96%;
 
-    --card: 147 45% 12%;
-    --card-foreground: 0 0% 97%;
+    --card: 150 30% 11%;
+    --card-foreground: 150 30% 96%;
 
-    --popover: 147 45% 12%;
-    --popover-foreground: 0 0% 97%;
+    --popover: 150 30% 11%;
+    --popover-foreground: 150 30% 96%;
 
-    --primary: 150 93% 38%;
-    --primary-foreground: 147 55% 8%;
+    --primary: 150 85% 42%;
+    --primary-foreground: 150 40% 7%;
 
     --secondary: 150 60% 22%;
     --secondary-foreground: 0 0% 97%;
 
-    --muted: 147 30% 18%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 150 25% 17%;
+    --muted-foreground: 150 15% 72%;
 
     --accent: 205 46% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 147 25% 24%;
-    --input: 147 25% 24%;
-    --ring: 150 93% 38%;
-    --sidebar-background: 147 55% 8%;
-    --sidebar-foreground: 0 0% 97%;
-    --sidebar-primary: 150 93% 38%;
-    --sidebar-primary-foreground: 147 55% 8%;
+    --border: 150 25% 22%;
+    --input: 150 25% 22%;
+    --ring: 150 85% 42%;
+    --sidebar-background: 150 40% 7%;
+    --sidebar-foreground: 150 30% 96%;
+    --sidebar-primary: 150 85% 42%;
+    --sidebar-primary-foreground: 150 40% 7%;
     --sidebar-accent: 205 46% 50%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 147 25% 24%;
-    --sidebar-ring: 150 93% 38%;
+    --sidebar-border: 150 25% 22%;
+    --sidebar-ring: 150 85% 42%;
 
-    --chart-1: 150 93% 38%;
+    --chart-1: 150 85% 42%;
     --chart-2: 205 46% 50%;
     --chart-3: 146 51% 45%;
     --chart-4: 0 0% 70%;
@@ -311,5 +312,136 @@
   /* Corte diagonal da marca ENVIMAT (assinatura gráfica do manual) */
   .clip-diagonal-envimat {
     clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%, 0 22%);
+  }
+
+  /* ===== Modo escuro: cobertura dos usos fixos do tema claro =====
+     A ferramenta usa classes concretas (bg-white, text-emerald-950,
+     bg-[#F2F2F2]...) em vez de tokens semânticos. As regras abaixo
+     remapeiam essas classes dentro de .dark, preservando o tema claro
+     exatamente como está. */
+
+  /* Superfícies: fundo geral, cartões, cabeçalho e diálogos */
+  .dark .bg-\[\#F2F2F2\] {
+    background-color: hsl(150 40% 7%);
+  }
+  .dark .bg-\[\#fafcf9\] {
+    background-color: hsl(150 40% 7%);
+  }
+  .dark .bg-white {
+    background-color: hsl(150 30% 11%);
+  }
+  .dark .bg-white\/80 {
+    background-color: hsl(150 30% 11% / 0.85);
+  }
+  .dark .bg-white\/90 {
+    background-color: hsl(150 30% 11% / 0.92);
+  }
+
+  /* Textos: hierarquia clara sobre fundo escuro */
+  .dark .text-emerald-950,
+  .dark .text-emerald-900,
+  .dark .text-emerald-800 {
+    color: hsl(150 30% 92%);
+  }
+  .dark .text-emerald-700,
+  .dark .text-emerald-600 {
+    color: hsl(150 40% 74%);
+  }
+  .dark .text-envimat-verde-escuro {
+    color: hsl(150 30% 92%);
+  }
+  .dark .text-envimat-cinza {
+    color: hsl(150 15% 70%);
+  }
+
+  /* Bordas e divisórias */
+  .dark .border-emerald-100,
+  .dark .border-emerald-100\/80,
+  .dark .border-emerald-100\/90,
+  .dark .border-emerald-200,
+  .dark .border-emerald-200\/60 {
+    border-color: hsl(150 25% 24%);
+  }
+  .dark .divide-emerald-50 > :not([hidden]) ~ :not([hidden]) {
+    border-color: hsl(150 25% 20%);
+  }
+
+  /* Preenchimentos suaves (badges, ícones, áreas de destaque) */
+  .dark .bg-emerald-50,
+  .dark .bg-emerald-50\/50,
+  .dark .bg-emerald-50\/40,
+  .dark .bg-emerald-50\/30,
+  .dark .bg-emerald-50\/20 {
+    background-color: hsl(150 32% 16%);
+  }
+  .dark .bg-emerald-100,
+  .dark .bg-emerald-100\/80,
+  .dark .bg-emerald-100\/60,
+  .dark .bg-emerald-100\/50 {
+    background-color: hsl(150 30% 19%);
+  }
+  .dark .bg-\[\#E9F0EA\] {
+    background-color: hsl(150 25% 15%);
+  }
+
+  /* Botões outline/ghost herdam texto claro */
+  .dark .hover\:bg-emerald-50:hover {
+    background-color: hsl(150 32% 17%);
+  }
+
+  /* Tabelas de pré-visualização da importação */
+  .dark .hover\:bg-emerald-50\/30:hover {
+    background-color: hsl(150 32% 15%);
+  }
+
+  /* Campos de formulário com fundo branco fixo */
+  .dark .bg-white .bg-white,
+  .dark select.bg-white,
+  .dark button.bg-white {
+    background-color: hsl(150 25% 14%);
+  }
+
+  /* Estados de alerta (âmbar) legíveis no escuro */
+  .dark .bg-amber-50\/50,
+  .dark .bg-amber-50\/40 {
+    background-color: hsl(35 60% 14%);
+  }
+  .dark .border-amber-200 {
+    border-color: hsl(35 50% 30%);
+  }
+  .dark .text-amber-800,
+  .dark .text-amber-700 {
+    color: hsl(40 80% 75%);
+  }
+
+  /* Estados de erro (vermelho) legíveis no escuro */
+  .dark .bg-red-50\/50,
+  .dark .bg-red-50 {
+    background-color: hsl(0 45% 14%);
+  }
+  .dark .border-red-200 {
+    border-color: hsl(0 45% 30%);
+  }
+  .dark .text-red-700,
+  .dark .text-red-600 {
+    color: hsl(0 90% 78%);
+  }
+
+  /* Estados de sucesso (verde) legíveis no escuro */
+  .dark .bg-green-50\/50,
+  .dark .bg-green-50 {
+    background-color: hsl(145 45% 13%);
+  }
+  .dark .border-green-200 {
+    border-color: hsl(145 40% 28%);
+  }
+  .dark .text-green-800,
+  .dark .text-green-700 {
+    color: hsl(145 55% 72%);
+  }
+
+  /* Sombras pesadas do tema claro suavizadas no escuro */
+  .dark .shadow-\[0_8px_30px_rgba\(10\,68\,33\,0\.08\)\] {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
   }
 }

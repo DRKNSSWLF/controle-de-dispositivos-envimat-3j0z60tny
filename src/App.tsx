@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider, useAuth } from '@/lib/auth'
+import { TemaProvider } from '@/hooks/use-tema'
 import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import TelaLogin from './pages/TelaLogin'
@@ -17,8 +18,10 @@ function RotaProtegida({ children }: { children: ReactNode }) {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafcf9]">
-        <p className="text-emerald-700 text-sm animate-pulse">Carregando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#fafcf9] dark:bg-[#0b1a12]">
+        <p className="text-emerald-700 dark:text-emerald-dark-600 text-sm animate-pulse">
+          Carregando...
+        </p>
       </div>
     )
   }
@@ -34,27 +37,29 @@ function RotaLogin() {
 }
 
 const App = () => (
-  <BrowserRouter>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<RotaLogin />} />
-          <Route
-            element={
-              <RotaProtegida>
-                <Layout />
-              </RotaProtegida>
-            }
-          >
-            <Route path="/" element={<Index />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AuthProvider>
-    </TooltipProvider>
-  </BrowserRouter>
+  <TemaProvider>
+    <BrowserRouter>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<RotaLogin />} />
+            <Route
+              element={
+                <RotaProtegida>
+                  <Layout />
+                </RotaProtegida>
+              }
+            >
+              <Route path="/" element={<Index />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </TooltipProvider>
+    </BrowserRouter>
+  </TemaProvider>
 )
 
 export default App

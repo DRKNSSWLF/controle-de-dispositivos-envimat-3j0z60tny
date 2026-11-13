@@ -1,6 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ENVIMAT">
-  <!-- Favicon ENVIMAT: ícone "E" com corte diagonal na cor oficial #086830 -->
-  <rect width="512" height="512" rx="96" fill="#086830"/>
-  <path d="M176 144 H336 V200 H232 V224 H320 V280 H232 V312 H336 V368 H176 Z" fill="#ffffff"/>
-  <path d="M336 144 H512 L424 200 H336 Z" fill="#1F9443" opacity="0.85"/>
+  <!-- Favicon ENVIMAT (2026): bloco de logotipo simplificado — faixa superior
+       escura + campo verde com "ENVIMAT" em branco (recorte do logo oficial) -->
+  <rect width="512" height="512" rx="96" fill="#0A4421"/>
+  <rect y="96" width="512" height="96" fill="#086830"/>
+  <rect y="128" width="512" height="284" fill="#2E9E52"/>
+  <text
+    x="256"
+    y="300"
+    font-family="Arial Black, Arial, Helvetica, sans-serif"
+    font-size="128"
+    font-weight="900"
+    letter-spacing="2"
+    fill="#ffffff"
+    text-anchor="middle"
+  >ENVIMAT</text>
 </svg>

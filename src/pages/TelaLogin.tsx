@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Lock, Mail, ShieldCheck, AlertCircle, KeyRound, ArrowLeft, MailCheck } from 'lucide-react'
 import { useAuth, DOMINIO_EMPRESA } from '@/lib/auth'
+import { BotaoAlternarTema } from '@/hooks/use-tema'
 import pb from '@/lib/pocketbase/client'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
 
@@ -63,19 +64,23 @@ export default function TelaLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F2F2F2] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F2F2F2] dark:bg-[#0b1a12] p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white/90 backdrop-blur rounded-3xl border border-emerald-100 shadow-[0_8px_30px_rgba(10,68,33,0.08)] p-8">
+        {/* Seletor de tema claro/escuro (persiste em localStorage) */}
+        <div className="flex justify-end mb-3">
+          <BotaoAlternarTema />
+        </div>
+        <div className="bg-white/90 dark:bg-white/90 backdrop-blur rounded-3xl border border-emerald-100 dark:border-emerald-800/60 shadow-[0_8px_30px_rgba(10,68,33,0.08)] p-8">
           <div className="flex flex-col items-center text-center gap-3 mb-8">
             <img
-              src="/envimat-logo.svg"
+              src="/logo-envimat.png"
               alt="ENVIMAT — Environment & Material Handling"
               className="h-12 w-auto"
             />
-            <h1 className="font-sans font-semibold text-2xl text-emerald-950 leading-tight tracking-tight">
+            <h1 className="font-sans font-semibold text-2xl text-emerald-950 dark:text-emerald-dark-800 leading-tight tracking-tight">
               Controle de Dispositivos e Comodato
             </h1>
-            <p className="text-xs text-emerald-700/80 flex items-center gap-1.5">
+            <p className="text-xs text-emerald-700/80 dark:text-emerald-dark-400 flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
               Acesso restrito a e-mails corporativos @envimat.com.br
             </p>

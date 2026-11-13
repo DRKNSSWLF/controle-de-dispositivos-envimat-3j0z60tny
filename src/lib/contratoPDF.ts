@@ -8,24 +8,25 @@ import { camposDoDispositivo } from '@/lib/contratoCampos'
 // O LOGO da ENVIMAT é carregado, embutido via canvas (dataURL PNG) e incluído no
 // cabeçalho — o PDF continua autocontido, sem referência externa.
 
-// Dados fixos da ENVIMAT extraídos do contrato real
-const ENVIMAT_RAZAO = 'ENVIMAT TECNOLOGIA EM MEIO AMBIENTE E MOVIMENTAÇÃO DE CARGAS LTDA'
-const ENVIMAT_RODAPE_1 = 'ENVIMAT TECNOLOGIA EM MEIO AMBIENTE E MOVIMENTAÇÃO DE CARGA'
-const ENVIMAT_RODAPE_2 = 'CNPJ: 31.738.226/0001-18 - I.E.: 123.094.509.110'
-const ENVIMAT_RODAPE_3 = 'ENDEREÇO: RUA GUARATINGUETÁ, 234 – MOOCA – SÃO PAULO – SP'
-const ENVIMAT_RODAPE_4 = 'TELEFONE: (11) 2796-8196 – SITE: www.envimat.com.br'
+// Dados fixos da ENVIMAT — atualizados conforme o Cartão CNPJ da MATRIZ (2026)
+const ENVIMAT_RODAPE_1 = 'ENVIMAT ENVIRONMENT & MATERIAL HANDLING LTDA'
+const ENVIMAT_RODAPE_2 = 'CNPJ: 13.943.060/0001-80'
+const ENVIMAT_RODAPE_3 =
+  'ENDEREÇO: ALAMEDA SINLIOKU TANAKA, 170 – EDIF. 21 – PARQUE TECNOLÓGICO DAMHA I – SÃO CARLOS/SP – CEP 13565-261'
+const ENVIMAT_RODAPE_4 = 'SITE: www.envimat.com.br'
 
 const COMODANTE_QUALIFICACAO =
-  'na qualidade de COMODANTE: ENVIMAT TECNOLOGIA EM MEIO AMBIENTE E MOVIMENTAÇÃO DE CARGAS LTDA, ' +
-  'com sede em São Paulo, na rua Guaratinguetá, nº 234, bairro Mooca, CEP 03112-080, no Estado de ' +
-  'São Paulo, inscrita no CNPJ sob o nº 31.738.226/0001-18 e no Cadastro Estadual sob o nº ' +
-  '123.094.509.110, neste ato representada pelo seu diretor VINICIUS CASSELLI, brasileiro, casado, ' +
-  'engenheiro agrônomo, Carteira de Identidade nº 24.952.844-7, CPF: 170.515.388-70, residente e ' +
+  'na qualidade de COMODANTE: ENVIMAT ENVIRONMENT & MATERIAL HANDLING LTDA, ' +
+  'com sede em São Carlos, na Alameda Sinlioku Tanaka, nº 170, Edif. 21, Parque Tecnológico Damha I, ' +
+  'CEP 13565-261, no Estado de São Paulo, inscrita no CNPJ sob o nº 13.943.060/0001-80, neste ato ' +
+  'representada pelo seu diretor VINICIUS CASSELLI, brasileiro, casado, engenheiro agrônomo, ' +
+  'Carteira de Identidade nº 24.952.844-7, CPF: 170.515.388-70, residente e ' +
   'domiciliado na Rua João Antônio de Oliveira nº 1228, apto. 12-C, CEP 03111-001, nesta capital, ' +
   'no Estado de São Paulo'
 
-// Logo (ícone vetorial da marca) convertido para PNG em runtime e embutido no PDF
-const LOGO_URL = 'https://img.usecurling.com/i?q=envimat&color=green&shape=fill'
+// Logo oficial ENVIMAT (PNG do manual da marca enviado pelo usuário), convertido
+// para dataURL em runtime e embutido no PDF — autocontido, sem referência externa.
+const LOGO_URL = '/logo-envimat.png'
 
 interface LogoEmbutido {
   dataUrl: string
@@ -59,7 +60,9 @@ async function carregarLogo(): Promise<LogoEmbutido | null> {
       img.src = LOGO_URL
     })
     if (!dataUrl) return null
-    logoCache = { dataUrl, altura: 18 * 0.42 } // ícone ~quadrado: 18 mm x ~7,5 mm
+    // Assinatura completa do logo: proporção real do PNG (~4,6:1) com pequena folga
+    const proporcao = 0.22
+    logoCache = { dataUrl, altura: 40 * proporcao }
     return logoCache
   } catch {
     return null
@@ -240,24 +243,20 @@ function rodape(doc: jsPDF) {
 
 function cabecalho(doc: jsPDF, y: number, logo: LogoEmbutido | null): number {
   const margem = 14
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(13)
-  doc.setTextColor(20, 90, 55)
-  doc.text('ENVIMAT', margem, y + 4)
-  doc.setFont('helvetica', 'italic')
-  doc.setFontSize(7.5)
-  doc.setTextColor(60, 120, 85)
-  doc.text('Environment & Material Handling', margem, y + 8)
-  doc.setTextColor(0)
   if (logo) {
-    doc.addImage(
-      logo.dataUrl,
-      'PNG',
-      doc.internal.pageSize.getWidth() - margem - 14,
-      y - 1,
-      14,
-      logo.altura,
-    )
+    // Logo oficial completo (assinatura ENVIMAT) no topo, à esquerda
+    doc.addImage(logo.dataUrl, 'PNG', margem, y - 2, 40, logo.altura)
+    doc.setTextColor(0)
+  } else {
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(13)
+    doc.setTextColor(20, 90, 55)
+    doc.text('ENVIMAT', margem, y + 4)
+    doc.setFont('helvetica', 'italic')
+    doc.setFontSize(7.5)
+    doc.setTextColor(60, 120, 85)
+    doc.text('Environment & Material Handling', margem, y + 8)
+    doc.setTextColor(0)
   }
   doc.setDrawColor(20, 90, 55)
   doc.setLineWidth(0.5)
@@ -332,8 +331,8 @@ function blocoAssinaturas(doc: jsPDF, ctx: CtxVia, y: number): number {
   doc.line(col1 - 30, y, col1 + 30, y)
   doc.setFontSize(7)
   doc.setFont('helvetica', 'bold')
-  doc.text('ENVIMAT TECNOLOGIA EM MEIO AMBIENTE', col1, y + 3.2, { align: 'center' })
-  doc.text('E MOVIMENTAÇÃO DE CARGA LTDA', col1, y + 6, { align: 'center' })
+  doc.text('ENVIMAT ENVIRONMENT & MATERIAL', col1, y + 3.2, { align: 'center' })
+  doc.text('HANDLING LTDA', col1, y + 6, { align: 'center' })
   doc.setFont('helvetica', 'normal')
   doc.text('Vinícius Casselli', col1, y + 8.8, { align: 'center' })
   doc.text('CPF: 170.515.388-70', col1, y + 11.6, { align: 'center' })

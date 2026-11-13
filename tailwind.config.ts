@@ -4,6 +4,7 @@ import typographyPlugin from '@tailwindcss/typography'
 import aspectRatioPlugin from '@tailwindcss/aspect-ratio'
 
 const config: Partial<Config> = {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     container: {
@@ -37,7 +38,8 @@ const config: Partial<Config> = {
           'branco-gelo': '#F2F2F2',
         },
         /* Escala "emerald" remapeada para a paleta ENVIMAT — mantém os usos
-           existentes no código alinhados às cores oficiais da marca */
+           existentes no código alinhados às cores oficiais da marca.
+           dark: variantes claras usadas no modo escuro (estratégia "class") */
         emerald: {
           50: '#eef6f1',
           100: '#d9eadd',
@@ -50,6 +52,19 @@ const config: Partial<Config> = {
           800: '#0A4421',
           900: '#082d17',
           950: '#05200f',
+          dark: {
+            50: '#12261b',
+            100: '#17301f',
+            200: '#1d3b26',
+            300: '#274730',
+            400: '#3f6a50',
+            500: '#4f9c6b',
+            600: '#6dbd8a',
+            700: '#8fd6a8',
+            800: '#b2e6c4',
+            900: '#d3f2de',
+            950: '#eafaf0',
+          },
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

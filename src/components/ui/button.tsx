@@ -1,4 +1,5 @@
 /* Button Component primitives - A component that displays a button - from shadcn/ui (exposes Button, buttonVariants) */
+/* Modo escuro: variantes com cores fixas ENVIMAT ganham fallback legível */
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
@@ -13,7 +14,9 @@ const buttonVariants = cva(
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
+          'border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground dark:text-emerald-dark-800 dark:border-emerald-dark-300 dark:hover:bg-emerald-dark-100 dark:hover:text-emerald-dark-900',
+        outlineIcon:
+          'border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground dark:text-emerald-dark-700 dark:border-emerald-dark-300 dark:hover:bg-emerald-dark-100 dark:hover:text-emerald-dark-900',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'text-foreground hover:bg-accent hover:text-accent-foreground',
         link: 'text-foreground underline-offset-4 hover:underline',
