@@ -33,6 +33,7 @@ import { SecaoManutencao } from '@/components/SecaoManutencao'
 import { SecaoHistorico } from '@/components/SecaoHistorico'
 import { ImportarDispositivos } from '@/components/ImportarDispositivos'
 import { ImportarColaboradores } from '@/components/ImportarColaboradores'
+import { ImportarLinhas } from '@/components/ImportarLinhas'
 import { PainelAlertas } from '@/components/PainelAlertas'
 import { SecaoUsuarios } from '@/components/SecaoUsuarios'
 import { SecaoLogs } from '@/components/SecaoLogs'
@@ -65,9 +66,9 @@ export default function Index() {
   const { usuario, sair } = useAuth()
   const ehMaster = usuario?.nivel === 'master'
   const [abaAtiva, setAbaAtiva] = useState<string>('geral')
-  const [subAbaImportacao, setSubAbaImportacao] = useState<'dispositivos' | 'colaboradores'>(
-    'dispositivos',
-  )
+  const [subAbaImportacao, setSubAbaImportacao] = useState<
+    'dispositivos' | 'colaboradores' | 'linhas'
+  >('dispositivos')
 
   const [dispositivos, setDispositivos] = useState<Dispositivo[]>([])
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([])
@@ -527,6 +528,17 @@ export default function Index() {
               >
                 2. Planilha de Colaboradores
               </button>
+              <button
+                type="button"
+                onClick={() => setSubAbaImportacao('linhas')}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all ${
+                  subAbaImportacao === 'linhas'
+                    ? 'bg-white text-emerald-950 shadow-sm font-semibold'
+                    : 'text-emerald-800/80 hover:text-emerald-950'
+                }`}
+              >
+                3. Planilha de Linhas
+              </button>
             </div>
 
             {subAbaImportacao === 'dispositivos' ? (
@@ -537,11 +549,18 @@ export default function Index() {
                   setAbaAtiva('dispositivos')
                 }}
               />
-            ) : (
+            ) : subAbaImportacao === 'colaboradores' ? (
               <ImportarColaboradores
                 onImportadoSucesso={() => {
                   carregarDados()
                   setAbaAtiva('colaboradores')
+                }}
+              />
+            ) : (
+              <ImportarLinhas
+                onImportadoSucesso={() => {
+                  carregarDados()
+                  setAbaAtiva('linhas')
                 }}
               />
             )}

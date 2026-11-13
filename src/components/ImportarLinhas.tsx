@@ -9,9 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { parseCSVContent, inferMapping, ParsedSheet } from '@/lib/sheetParser'
+import { parseCSVContent, inferMapping, type ParsedSheet } from '@/lib/sheetParser'
 import { linhasService, vinculosLinhasService } from '@/services/linhasService'
-import { NovaLinhaInput, StatusLinha, TipoLinha } from '@/types/inventory'
+import { type NovaLinhaInput, type StatusLinha, type TipoLinha } from '@/types/inventory'
 import { somenteDigitos } from '@/lib/validacoes'
 import { Upload, PhoneCall, CheckCircle2, ArrowRight, RefreshCw, Download } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
@@ -47,7 +47,7 @@ const TARGET_FIELDS = [
   { key: 'observacoes', label: 'Observações', aliases: ['observacoes', 'obs', 'notas'] },
 ]
 
-const STATUS_VALIDOS: StatusLinha[] = ['disponivel', 'em_uso', 'bloqueada', 'cancelada']
+const STATUS_VALIDOS: StatusLinha[] = ['disponivel', 'em_uso', 'cancelada']
 
 /** Normaliza o status da planilha para um status válido da coleção. */
 function normalizarStatus(valor: string): StatusLinha {
@@ -57,7 +57,6 @@ function normalizarStatus(valor: string): StatusLinha {
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
   if (v.includes('uso')) return 'em_uso'
-  if (v.includes('bloq')) return 'bloqueada'
   if (v.includes('canc')) return 'cancelada'
   if (v.includes('disp') || v.includes('livre') || v === '') return 'disponivel'
   return (STATUS_VALIDOS.find((s) => s === v) || 'disponivel') as StatusLinha
@@ -120,7 +119,7 @@ export function ImportarLinhas({ onImportadoSucesso }: ImportarLinhasProps) {
       '(16) 99123-4501,Vivo,Controle corporativo 10GB,celular,356938035643809,em_uso,Marcos Vinicius Santos,Linha atribuída a operador de campo\n' +
       '(16) 99123-4502,Claro,Corporate 5GB,celular,356938035643810,disponivel,,Linha reserva do estoque\n' +
       '(16) 99123-4503,Tim,Modem industrial 20GB,modem,861234051234567,em_uso,Beatriz Vasconcelos,Modem de rastreamento do caminhão\n' +
-      '(16) 99123-4504,Vivo,Controle corporativo 10GB,celular,,bloqueada,,Bloqueada por perda — aguardando reposição'
+      '(16) 99123-4504,Vivo,Controle corporativo 10GB,celular,,cancelada,,Cancelada por perda — aguardando reposição'
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -144,7 +143,7 @@ export function ImportarLinhas({ onImportadoSucesso }: ImportarLinhasProps) {
     }
 
     setImportando(true)
-    const itensParaSalvar: NovaLinhaInput[] = []
+    const itensParaSalvar: (NovaLinhaInput & { colaboradorNomeImportacao?: string })[] = []
 
     for (const row of parsed.rows) {
       const numero = mapping.numero ? row[mapping.numero] : ''
@@ -154,7 +153,7 @@ export function ImportarLinhas({ onImportadoSucesso }: ImportarLinhasProps) {
       const status = normalizarStatus(statusPlanilha)
       const nomeColaborador = mapping.colaborador ? row[mapping.colaborador]?.trim() : ''
 
-      itensParaSalvar.push({
+      const item: NovaLinhaInput & { colaboradorNomeImportacao?: string } = {
         numero: somenteDigitos(numero),
         operadora: mapping.operadora ? row[mapping.operadora] : '',
         plano: mapping.plano ? row[mapping.plano] : '',
@@ -164,11 +163,11 @@ export function ImportarLinhas({ onImportadoSucesso }: ImportarLinhasProps) {
         observacoes: mapping.observacoes
           ? row[mapping.observacoes]
           : `Importado da planilha ${fileName}`,
-      })
-      if (nomeColaborador) {
-        itensParaSalvar[itensParaSalvar.length - 1].colaboradorNomeImportacao =
-          nomeColaborador as never
       }
+      if (nomeColaborador) {
+        item.colaboradorNomeImportacao = nomeColaborador
+      }
+      itensParaSalvar.push(item)
     }
 
     try {
@@ -182,15 +181,9 @@ export function ImportarLinhas({ onImportadoSucesso }: ImportarLinhasProps) {
             colaboradorNomeImportacao?: string
           }
 
-          let colaboradorId: string | undefined
-          if (colaboradorNomeImportacao) {
-            const resp = await linhasService
-              .listar() // mantém as buscas simples: resolve o nome após inserir
-              .then(() => null)
-              .catch(() => null)
-            void resp
-            colaboradorId = await resolverColaborador(colaboradorNomeImportacao)
-          }
+          const colaboradorId = colaboradorNomeImportacao
+            ? await resolverColaborador(colaboradorNomeImportacao)
+            : undefined
 
           const criada = await linhasService.criar({ ...dados, colaborador: colaboradorId })
 
