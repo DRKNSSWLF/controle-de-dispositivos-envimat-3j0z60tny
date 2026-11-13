@@ -40,7 +40,9 @@ import { SecaoLogs } from '@/components/SecaoLogs'
 import { SecaoLinhas } from '@/components/SecaoLinhas'
 import { AreaCadastros } from '@/components/AreaCadastros'
 import { useAuth } from '@/lib/auth'
-import { BotaoAlternarTema } from '@/hooks/use-tema'
+import { BotaoAlternarTema, useTema } from '@/hooks/use-tema'
+import logoEnvimatClaro from '@/assets/logoenvimat-finalfb05-034a1.jpg'
+import logoEnvimatEscuro from '@/assets/logoenvimat-finalfvmodo-escuro-bc529.png'
 import {
   Smartphone,
   Users,
@@ -64,6 +66,7 @@ import { toast } from '@/hooks/use-toast'
 
 export default function Index() {
   const { usuario, sair } = useAuth()
+  const { tema } = useTema()
   const ehMaster = usuario?.nivel === 'master'
   const [abaAtiva, setAbaAtiva] = useState<string>('geral')
   const [subAbaImportacao, setSubAbaImportacao] = useState<
@@ -177,7 +180,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           {/* Logo oficial ENVIMAT (assinatura completa, arquivo do manual) */}
           <img
-            src="/logo-envimat.png"
+            src={tema === 'escuro' ? logoEnvimatEscuro : logoEnvimatClaro}
             alt="ENVIMAT — Environment & Material Handling"
             className="h-9 sm:h-10 w-auto shrink-0"
           />

@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf'
 import { Contrato, Dispositivo, Colaborador } from '@/types/inventory'
 import { camposDoDispositivo } from '@/lib/contratoCampos'
+import logoEnvimatUrl from '@/assets/logoenvimat-finalfb05-034a1.jpg'
 
 // Geração de PDF de Comodato / Distrato de Comodato em 2 vias (client-side, jsPDF).
 // Texto real do contrato de comodato da ENVIMAT (modelo enviado pelo usuário),
@@ -10,7 +11,7 @@ import { camposDoDispositivo } from '@/lib/contratoCampos'
 
 // Dados fixos da ENVIMAT — atualizados conforme o Cartão CNPJ da MATRIZ (2026)
 const ENVIMAT_RODAPE_1 = 'ENVIMAT ENVIRONMENT & MATERIAL HANDLING LTDA'
-const ENVIMAT_RODAPE_2 = 'CNPJ: 13.943.060/0001-80'
+const ENVIMAT_RODAPE_2 = 'CNPJ: 31.738.226/0001-18'
 const ENVIMAT_RODAPE_3 =
   'ENDEREÇO: ALAMEDA SINLIOKU TANAKA, 170 – EDIF. 21 – PARQUE TECNOLÓGICO DAMHA I – SÃO CARLOS/SP – CEP 13565-261'
 const ENVIMAT_RODAPE_4 = 'SITE: www.envimat.com.br'
@@ -18,15 +19,16 @@ const ENVIMAT_RODAPE_4 = 'SITE: www.envimat.com.br'
 const COMODANTE_QUALIFICACAO =
   'na qualidade de COMODANTE: ENVIMAT ENVIRONMENT & MATERIAL HANDLING LTDA, ' +
   'com sede em São Carlos, na Alameda Sinlioku Tanaka, nº 170, Edif. 21, Parque Tecnológico Damha I, ' +
-  'CEP 13565-261, no Estado de São Paulo, inscrita no CNPJ sob o nº 13.943.060/0001-80, neste ato ' +
+  'CEP 13565-261, no Estado de São Paulo, inscrita no CNPJ sob o nº 31.738.226/0001-18, neste ato ' +
   'representada pelo seu diretor VINICIUS CASSELLI, brasileiro, casado, engenheiro agrônomo, ' +
   'Carteira de Identidade nº 24.952.844-7, CPF: 170.515.388-70, residente e ' +
   'domiciliado na Rua João Antônio de Oliveira nº 1228, apto. 12-C, CEP 03111-001, nesta capital, ' +
   'no Estado de São Paulo'
 
-// Logo oficial ENVIMAT (PNG do manual da marca enviado pelo usuário), convertido
-// para dataURL em runtime e embutido no PDF — autocontido, sem referência externa.
-const LOGO_URL = '/logo-envimat.png'
+// Logo oficial ENVIMAT (versão CLARA, fundo verde) — asset do próprio bundle,
+// convertido para dataURL em runtime e embutido no PDF — autocontido, sem
+// referência externa nem dependência de tema.
+const LOGO_URL = logoEnvimatUrl
 
 interface LogoEmbutido {
   dataUrl: string
@@ -38,12 +40,14 @@ let logoCache: LogoEmbutido | null = null
 async function carregarLogo(): Promise<LogoEmbutido | null> {
   if (logoCache) return logoCache
   try {
+    let proporcaoReal = 0
     const dataUrl = await new Promise<string | null>((resolve) => {
       const img = new Image()
       img.crossOrigin = 'anonymous'
       img.onload = () => {
         try {
-          const largura = 160
+          const largura = 320
+          proporcaoReal = img.naturalHeight / img.naturalWidth
           const altura = Math.max(1, Math.round((img.naturalHeight / img.naturalWidth) * largura))
           const canvas = document.createElement('canvas')
           canvas.width = largura
@@ -60,8 +64,8 @@ async function carregarLogo(): Promise<LogoEmbutido | null> {
       img.src = LOGO_URL
     })
     if (!dataUrl) return null
-    // Assinatura completa do logo: proporção real do PNG (~4,6:1) com pequena folga
-    const proporcao = 0.22
+    // Assinatura completa do logo: proporção real do arquivo, com pequena folga
+    const proporcao = proporcaoReal > 0 ? proporcaoReal * 1.02 : 0.22
     logoCache = { dataUrl, altura: 40 * proporcao }
     return logoCache
   } catch {

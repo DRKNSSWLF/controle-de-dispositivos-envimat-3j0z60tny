@@ -4,7 +4,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Lock, Mail, ShieldCheck, AlertCircle, KeyRound, ArrowLeft, MailCheck } from 'lucide-react'
 import { useAuth, DOMINIO_EMPRESA } from '@/lib/auth'
-import { BotaoAlternarTema } from '@/hooks/use-tema'
+import { BotaoAlternarTema, useTema } from '@/hooks/use-tema'
+import logoEnvimatClaro from '@/assets/logoenvimat-finalfb05-034a1.jpg'
+import logoEnvimatEscuro from '@/assets/logoenvimat-finalfvmodo-escuro-bc529.png'
 import pb from '@/lib/pocketbase/client'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
 
@@ -12,6 +14,7 @@ type Visao = 'login' | 'esqueci' | 'esqueci-enviado'
 
 export default function TelaLogin() {
   const { entrar } = useAuth()
+  const { tema } = useTema()
   const [visao, setVisao] = useState<Visao>('login')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
@@ -73,7 +76,7 @@ export default function TelaLogin() {
         <div className="bg-white/90 dark:bg-white/90 backdrop-blur rounded-3xl border border-emerald-100 dark:border-emerald-800/60 shadow-[0_8px_30px_rgba(10,68,33,0.08)] p-8">
           <div className="flex flex-col items-center text-center gap-3 mb-8">
             <img
-              src="/logo-envimat.png"
+              src={tema === 'escuro' ? logoEnvimatEscuro : logoEnvimatClaro}
               alt="ENVIMAT — Environment & Material Handling"
               className="h-12 w-auto"
             />
