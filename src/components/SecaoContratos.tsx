@@ -7,6 +7,7 @@ import { Colaborador, Contrato, Dispositivo } from '@/types/inventory'
 import { gerarPDFContrato } from '@/lib/contratoPDF'
 import { LABEL_TIPO_CONTRATO } from '@/lib/labels'
 import { formatarData } from '@/lib/format'
+import { AnexosContrato } from '@/components/AnexosContrato'
 import { FileText, Printer, Search, Stamp } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
@@ -160,6 +161,9 @@ export function SecaoContratos({ contratos, dispositivos, colaboradores }: Secao
                     <Printer className="w-3.5 h-3.5 mr-1" />
                     PDF (2 vias)
                   </Button>
+                </CardContent>
+                <CardContent className="pt-0 px-4 pb-4">
+                  <AnexosContrato contratoId={contrato.id} />
                 </CardContent>
               </Card>
             )

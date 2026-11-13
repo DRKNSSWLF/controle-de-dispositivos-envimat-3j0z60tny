@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-13T00:15:27.696Z",
+  "generatedAt": "2026-11-13T00:48:56.553Z",
   "collections": [
     {
       "name": "users",
@@ -977,6 +977,60 @@
         "CREATE INDEX `idx_vinculos_linhas_colaborador` ON `vinculos_linhas` (colaborador)",
         "CREATE INDEX `idx_vinculos_linhas_linha` ON `vinculos_linhas` (linha)"
       ]
+    },
+    {
+      "name": "anexos_contratos",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != \"\"",
+        "view": "@request.auth.id != \"\"",
+        "create": "@request.auth.id != \"\"",
+        "update": "@request.auth.id != \"\"",
+        "delete": "@request.auth.id != \"\""
+      },
+      "fields": [
+        {
+          "name": "contrato",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "contratos"
+        },
+        {
+          "name": "arquivo",
+          "type": "file",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "enviado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_anexos_contratos_contrato ON anexos_contratos (contrato)"]
     }
   ]
 }
