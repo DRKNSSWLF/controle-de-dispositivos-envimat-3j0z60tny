@@ -32,7 +32,8 @@ const LOGO_URL = logoEnvimatUrl
 
 interface LogoEmbutido {
   dataUrl: string
-  altura: number // altura proporcional para largura de 18 mm
+  largura: number // largura em mm no PDF
+  altura: number // altura em mm no PDF (proporcional ao arquivo real)
 }
 
 let logoCache: LogoEmbutido | null = null
@@ -66,7 +67,11 @@ async function carregarLogo(): Promise<LogoEmbutido | null> {
     if (!dataUrl) return null
     // Assinatura completa do logo: proporção real do arquivo, com pequena folga
     const proporcao = proporcaoReal > 0 ? proporcaoReal * 1.02 : 0.22
-    logoCache = { dataUrl, altura: 40 * proporcao }
+    // Cabeçalho: logo centralizado, com ~8 mm de altura e sempre acima da
+    // linha de separação (desenhada em y + 11 do cabeçalho)
+    const altura = 8
+    const largura = Math.min(40, altura / proporcao)
+    logoCache = { dataUrl, largura, altura }
     return logoCache
   } catch {
     return null
@@ -248,8 +253,17 @@ function rodape(doc: jsPDF) {
 function cabecalho(doc: jsPDF, y: number, logo: LogoEmbutido | null): number {
   const margem = 14
   if (logo) {
-    // Logo oficial completo (assinatura ENVIMAT) no topo, à esquerda
-    doc.addImage(logo.dataUrl, 'PNG', margem, y - 2, 40, logo.altura)
+    // Logo oficial completo (assinatura ENVIMAT): centrado no topo, terminando
+    // acima da linha de separação (y + 11) com folga
+    const larguraPagina = doc.internal.pageSize.getWidth()
+    doc.addImage(
+      logo.dataUrl,
+      'PNG',
+      (larguraPagina - logo.largura) / 2,
+      y - 3,
+      logo.largura,
+      logo.altura,
+    )
     doc.setTextColor(0)
   } else {
     doc.setFont('helvetica', 'bold')
